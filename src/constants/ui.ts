@@ -1,0 +1,181 @@
+/**
+ * UI-related constants
+ */
+
+/**
+ * Route paths for navigation
+ */
+export const ROUTES = {
+  HOME: '/',
+  
+  // Auth routes
+  AUTH: {
+    LOGIN: '/auth/login',
+    REGISTER: '/auth/register',
+    FORGOT_PASSWORD: '/auth/forgot-password',
+    RESET_PASSWORD: '/auth/reset-password',
+  },
+
+  // Shop routes
+  SHOP: {
+    PRODUCTS: '/products',
+    PRODUCT_DETAIL: (slug: string) => `/products/${slug}`,
+    CATEGORY: (slug: string) => `/categories/${slug}`,
+    SEARCH: '/search',
+  },
+
+  // User routes
+  USER: {
+    PROFILE: '/account/profile',
+    ORDERS: '/account/orders',
+    ORDER_DETAIL: (id: string) => `/account/orders/${id}`,
+    ADDRESSES: '/account/addresses',
+    WISHLIST: '/account/wishlist',
+    REVIEWS: '/account/reviews',
+  },
+
+  // Checkout routes
+  CHECKOUT: {
+    CART: '/cart',
+    CHECKOUT: '/checkout',
+    PAYMENT: '/checkout/payment',
+    CONFIRMATION: '/checkout/confirmation',
+  },
+
+  // Static pages
+  STATIC: {
+    ABOUT: '/about',
+    CONTACT: '/contact',
+    TERMS: '/terms',
+    PRIVACY: '/privacy',
+    FAQ: '/faq',
+  },
+} as const;
+
+/**
+ * Breakpoint values for responsive design
+ */
+export const BREAKPOINTS = {
+  SM: 640,
+  MD: 768,
+  LG: 1024,
+  XL: 1280,
+  XXL: 1536,
+} as const;
+
+/**
+ * Z-index layers
+ */
+export const Z_INDEX = {
+  DROPDOWN: 10,
+  STICKY: 20,
+  FIXED: 30,
+  MODAL_BACKDROP: 40,
+  MODAL: 50,
+  POPOVER: 60,
+  TOOLTIP: 70,
+  TOAST: 80,
+} as const;
+
+/**
+ * Animation durations in milliseconds
+ */
+export const ANIMATION_DURATION = {
+  FAST: 150,
+  NORMAL: 300,
+  SLOW: 500,
+} as const;
+
+/**
+ * Toast notification durations in milliseconds
+ */
+export const TOAST_DURATION = {
+  SHORT: 3000,
+  NORMAL: 5000,
+  LONG: 8000,
+} as const;
+
+/**
+ * Order status display configuration
+ */
+export const ORDER_STATUS_CONFIG = {
+  PENDING: {
+    label: 'Pendiente',
+    color: 'bg-yellow-100 text-yellow-800',
+    icon: 'Clock',
+  },
+  CONFIRMED: {
+    label: 'Confirmado',
+    color: 'bg-blue-100 text-blue-800',
+    icon: 'CheckCircle',
+  },
+  PROCESSING: {
+    label: 'Procesando',
+    color: 'bg-indigo-100 text-indigo-800',
+    icon: 'Package',
+  },
+  SHIPPED: {
+    label: 'Enviado',
+    color: 'bg-purple-100 text-purple-800',
+    icon: 'Truck',
+  },
+  DELIVERED: {
+    label: 'Entregado',
+    color: 'bg-green-100 text-green-800',
+    icon: 'CheckCircle2',
+  },
+  CANCELLED: {
+    label: 'Cancelado',
+    color: 'bg-red-100 text-red-800',
+    icon: 'XCircle',
+  },
+  REFUNDED: {
+    label: 'Reembolsado',
+    color: 'bg-gray-100 text-gray-800',
+    icon: 'RotateCcw',
+  },
+} as const;
+
+/**
+ * Payment method display configuration
+ */
+export const PAYMENT_METHOD_CONFIG = {
+  STRIPE: {
+    label: 'Tarjeta de Crédito/Débito',
+    icon: 'CreditCard',
+  },
+  MERCADOPAGO: {
+    label: 'MercadoPago',
+    icon: 'Wallet',
+  },
+  CASH_ON_DELIVERY: {
+    label: 'Pago contra entrega',
+    icon: 'Banknote',
+  },
+} as const;
+
+/**
+ * Shipping carrier display configuration
+ */
+export const SHIPPING_CARRIER_CONFIG = {
+  OLVA: {
+    label: 'Olva Courier',
+    estimatedDays: '2-3',
+  },
+  SHALOM: {
+    label: 'Shalom',
+    estimatedDays: '3-5',
+  },
+  CRUZ_DEL_SUR: {
+    label: 'Cruz del Sur',
+    estimatedDays: '2-4',
+  },
+  SERVIENTREGA: {
+    label: 'Servientrega',
+    estimatedDays: '3-5',
+  },
+  PICKUP: {
+    label: 'Recojo en tienda',
+    estimatedDays: '1',
+  },
+} as const;
