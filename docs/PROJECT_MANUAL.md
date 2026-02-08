@@ -56,7 +56,8 @@ client/
 │   │   │   ├── Modal.tsx
 │   │   │   ├── Loading.tsx
 │   │   │   ├── Rating.tsx
-│   │   │   └── Badge.tsx
+│   │   │   ├── Badge.tsx
+│   │   │   └── Toast.tsx
 │   │   └── layout/               # Componentes de layout
 │   │       ├── Header.tsx
 │   │       └── Footer.tsx
@@ -341,6 +342,40 @@ useRemoveFromWishlist() // Eliminar producto
 <Loading size="sm" | "md" | "lg" />
 <Skeleton className="h-4 w-32" />
 ```
+
+### Toast (Notificaciones)
+
+El sistema de notificaciones usa un store global y un componente `ToastContainer` que se renderiza en el layout principal.
+
+```tsx
+// Usando helpers (recomendado)
+import { toast } from '@/store';
+
+// Tipos disponibles
+toast.success('Título', 'Mensaje opcional');
+toast.error('Error', 'Descripción del error');
+toast.warning('Advertencia', 'Mensaje de advertencia');
+toast.info('Información', 'Mensaje informativo');
+
+// Usando el store directamente
+import { useUIStore } from '@/store';
+
+const { addToast } = useUIStore();
+
+addToast({
+  type: 'success' | 'error' | 'warning' | 'info',
+  title: 'Título requerido',
+  message: 'Mensaje opcional',
+  duration: 5000 // ms, default 5000, usar 0 para no auto-cerrar
+});
+```
+
+**Características:**
+- Aparecen en esquina inferior derecha
+- Se auto-cierran después del `duration`
+- Animación de entrada/salida
+- Botón para cerrar manualmente
+- Accesibles con `aria-live`
 
 ## 🔐 Autenticación
 

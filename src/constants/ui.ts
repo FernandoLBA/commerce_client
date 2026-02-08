@@ -13,7 +13,7 @@ export const ROUTES = {
     LOGIN: '/auth/login',
     REGISTER: '/auth/register',
     FORGOT_PASSWORD: '/auth/forgot-password',
-    RESET_PASSWORD: '/auth/reset-password',
+    RESET_PASSWORD: (token: string) => `/auth/password-reset/${token}`,
     ACTIVATE_NOTIFICATION: '/auth/activate-notification',
     RESEND_ACTIVATION_EMAIL: '/auth/resend-activation',
     FORGOT_PASSWORD_NOTIFICATION: '/auth/forgot-password-notification',

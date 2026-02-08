@@ -58,4 +58,18 @@ export const authApi = {
   resendActivationEmail: async (email: string): Promise<void> => {
     await apiClient.post(API_ENDPOINTS.AUTH.RESEND_ACTIVATION_TOKEN, { email });
   },
+
+  /**
+   * Request password reset email
+   */
+  forgotPassword: async (email: string): Promise<void> => {
+    await apiClient.post(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, { email });
+  },
+
+  /**
+   * Reset password with token
+   */
+  resetPassword: async (token: string, password: string): Promise<void> => {
+    await apiClient.post(API_ENDPOINTS.AUTH.PASSWORD_RESET, { token, password });
+  },
 };

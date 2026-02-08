@@ -10,6 +10,8 @@ export const API_ENDPOINTS = {
     VALIDATE: '/auth/validate',
     ACTIVATE: '/auth/activate',
     RESEND_ACTIVATION_TOKEN: '/auth/resend-activation',
+    FORGOT_PASSWORD: '/auth/forgot-password',
+    PASSWORD_RESET: '/auth/password-reset',
   },
 
   // Users

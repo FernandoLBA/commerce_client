@@ -4,38 +4,40 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
 import { Button, Input } from '@/components/ui';
-import { forgotPasswordSchema, type ForgotPasswordFormData } from '@/lib/validations';
-import { useForgotPassword } from '@/hooks';
+import { resetPasswordSchema, type ResetPasswordFormData } from '@/lib/validations';
+import { useResetPassword } from '@/hooks';
 import { getErrorMessage } from '@/lib/api';
 import { ROUTES } from '@/constants';
 import { toast } from '@/store';
 
-export default function ForgotPasswordPage() {
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [submittedEmail, setSubmittedEmail] = useState('');
-  const forgotPasswordMutation = useForgotPassword();
+export default function ResetPasswordPage() {
+  const params = useParams();
+  const router = useRouter();
+  const token = params.token as string;
+  const [isSuccess, setIsSuccess] = useState(false);
+  const resetPasswordMutation = useResetPassword();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ForgotPasswordFormData>({
-    resolver: yupResolver(forgotPasswordSchema),
+  } = useForm<ResetPasswordFormData>({
+    resolver: yupResolver(resetPasswordSchema),
   });
 
-  const onSubmit = async (data: ForgotPasswordFormData) => {
+  const onSubmit = async (data: ResetPasswordFormData) => {
     try {
-      await forgotPasswordMutation.mutateAsync(data.email);
-      setSubmittedEmail(data.email);
-      setIsSubmitted(true);
-      toast.success('Correo enviado', 'Revisa tu bandeja de entrada');
+      await resetPasswordMutation.mutateAsync({ token, password: data.password });
+      setIsSuccess(true);
+      toast.success('¡Listo!', 'Tu contraseña ha sido actualizada');
     } catch (error) {
       toast.error('Error', getErrorMessage(error));
     }
   };
 
-  if (isSubmitted) {
+  if (isSuccess) {
     return (
       <div className="flex min-h-[calc(100vh-200px)] items-center justify-center px-4 py-12">
         <div className="w-full max-w-md text-center">
@@ -50,32 +52,25 @@ export default function ForgotPasswordPage() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                d="M5 13l4 4L19 7"
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Revisa tu correo</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Contraseña actualizada
+          </h1>
           <p className="mt-3 text-gray-600">
-            Hemos enviado las instrucciones para restablecer tu contraseña a{' '}
-            <span className="font-medium text-gray-900">{submittedEmail}</span>
+            Tu contraseña ha sido restablecida exitosamente. Ya puedes iniciar
+            sesión con tu nueva contraseña.
           </p>
-          <p className="mt-2 text-sm text-gray-500">
-            Si no recibes el correo en unos minutos, revisa tu carpeta de spam.
-          </p>
-          <div className="mt-8 space-y-3">
+          <div className="mt-8">
             <Button
-              variant="outline"
               className="w-full"
-              onClick={() => setIsSubmitted(false)}
+              size="lg"
+              onClick={() => router.push(ROUTES.AUTH.LOGIN)}
             >
-              Intentar con otro correo
+              Iniciar sesión
             </Button>
-            <Link
-              href={ROUTES.AUTH.LOGIN}
-              className="block text-sm font-medium text-primary-600 hover:text-primary-500"
-            >
-              Volver a iniciar sesión
-            </Link>
           </div>
         </div>
       </div>
@@ -87,31 +82,39 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-md">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900">
-            ¿Olvidaste tu contraseña?
+            Restablecer contraseña
           </h1>
           <p className="mt-2 text-gray-600">
-            Ingresa tu correo electrónico y te enviaremos las instrucciones para
-            restablecerla
+            Ingresa tu nueva contraseña
           </p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
           <Input
-            label="Correo electrónico"
-            type="email"
-            placeholder="tu@email.com"
-            autoComplete="email"
-            error={errors.email?.message}
-            {...register('email')}
+            label="Nueva contraseña"
+            type="password"
+            placeholder="••••••••"
+            autoComplete="new-password"
+            error={errors.password?.message}
+            {...register('password')}
+          />
+
+          <Input
+            label="Confirmar contraseña"
+            type="password"
+            placeholder="••••••••"
+            autoComplete="new-password"
+            error={errors.confirmPassword?.message}
+            {...register('confirmPassword')}
           />
 
           <Button
             type="submit"
             className="w-full"
             size="lg"
-            isLoading={forgotPasswordMutation.isPending}
+            isLoading={resetPasswordMutation.isPending}
           >
-            Enviar instrucciones
+            Restablecer contraseña
           </Button>
         </form>
 

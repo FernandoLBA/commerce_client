@@ -85,3 +85,16 @@ export function useResendActivationEmail() {
     mutationFn: (email: string) => authApi.resendActivationEmail(email),
   });
 }
+
+export function useForgotPassword() {
+  return useMutation({
+    mutationFn: (email: string) => authApi.forgotPassword(email),
+  });
+}
+
+export function useResetPassword() {
+  return useMutation({
+    mutationFn: ({ token, password }: { token: string; password: string }) =>
+      authApi.resetPassword(token, password),
+  });
+}

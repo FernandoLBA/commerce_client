@@ -37,6 +37,36 @@ export const loginSchema = yup.object({
 export type LoginFormData = yup.InferType<typeof loginSchema>;
 
 /**
+ * Forgot password form validation schema
+ */
+export const forgotPasswordSchema = yup.object({
+  email: yup
+    .string()
+    .required(VALIDATION_MESSAGES.REQUIRED)
+    .email(VALIDATION_MESSAGES.EMAIL_INVALID)
+    .max(VALIDATION.EMAIL_MAX_LENGTH),
+});
+
+export type ForgotPasswordFormData = yup.InferType<typeof forgotPasswordSchema>;
+
+/**
+ * Reset password form validation schema
+ */
+export const resetPasswordSchema = yup.object({
+  password: yup
+    .string()
+    .required(VALIDATION_MESSAGES.REQUIRED)
+    .min(VALIDATION.PASSWORD_MIN_LENGTH, VALIDATION_MESSAGES.PASSWORD_MIN)
+    .max(VALIDATION.PASSWORD_MAX_LENGTH, VALIDATION_MESSAGES.PASSWORD_MAX),
+  confirmPassword: yup
+    .string()
+    .required(VALIDATION_MESSAGES.REQUIRED)
+    .oneOf([yup.ref('password')], VALIDATION_MESSAGES.PASSWORD_MATCH),
+});
+
+export type ResetPasswordFormData = yup.InferType<typeof resetPasswordSchema>;
+
+/**
  * Registration form validation schema
  */
 export const registerSchema = yup.object({

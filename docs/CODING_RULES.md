@@ -720,18 +720,28 @@ export class ErrorBoundary extends Component<Props, State> {
 ### Mostrar Errores al Usuario
 
 ```typescript
-// Usando el UI Store
-const { addToast } = useUIStore();
+// Opción 1: Usando helpers de toast (recomendado)
+import { toast } from '@/store';
 
 try {
   await mutation.mutateAsync(data);
-  addToast({ type: 'success', message: 'Operación exitosa' });
+  toast.success('Operación exitosa', 'Los cambios fueron guardados');
 } catch (error) {
-  addToast({ 
-    type: 'error', 
-    message: error instanceof ApiError ? error.message : 'Error inesperado' 
-  });
+  toast.error(
+    'Error',
+    error instanceof ApiError ? error.message : 'Error inesperado'
+  );
 }
+
+// Opción 2: Usando el UI Store directamente
+const { addToast } = useUIStore();
+
+addToast({ 
+  type: 'success', 
+  title: 'Producto agregado',
+  message: 'Se añadió al carrito correctamente',
+  duration: 5000 // opcional, default 5000ms
+});
 ```
 
 ---
