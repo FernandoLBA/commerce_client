@@ -144,7 +144,7 @@ export default function WishlistPage() {
                   key={item.id}
                   className="group overflow-hidden rounded-xl border border-gray-200 bg-white transition-shadow hover:shadow-md"
                 >
-                  <Link href={ROUTES.SHOP.PRODUCT_DETAIL(product.slug)}>
+                  <Link href={ROUTES.SHOP.PRODUCT_DETAIL(product.id)}>
                     <div className="relative aspect-square overflow-hidden bg-gray-100">
                       {product.images && product.images.length > 0 && product.images[0] ? (
                         <Image
@@ -179,7 +179,7 @@ export default function WishlistPage() {
                   </Link>
 
                   <div className="p-4">
-                    <Link href={ROUTES.SHOP.PRODUCT_DETAIL(product.slug)}>
+                    <Link href={ROUTES.SHOP.PRODUCT_DETAIL(product.id)}>
                       <h3 className="mb-1 line-clamp-2 font-medium text-gray-900 group-hover:text-primary-600">
                         {product.name}
                       </h3>

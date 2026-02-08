@@ -4,3 +4,4 @@ export { Modal, type ModalProps } from './modal';
 export { Spinner, Loading, Skeleton, ProductCardSkeleton, ProductGridSkeleton } from './loading';
 export { Rating, RatingInput } from './rating';
 export { Badge, DiscountBadge, StockBadge } from './badge';
+export { ToastContainer } from './toast';
