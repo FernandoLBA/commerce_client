@@ -63,19 +63,19 @@ export function useProduct(
 }
 
 /**
- * Hook to fetch a single product by slug
+ * Hook to fetch a single product by id
  */
-export function useProductBySlug(
-  slug: string,
+export function useProductById(
+  id: string,
   options?: Omit<
     UseQueryOptions<ProductWithDetails, AxiosError<ApiError>>,
     'queryKey' | 'queryFn'
   >
 ) {
   return useQuery({
-    queryKey: QUERY_KEYS.PRODUCT_BY_SLUG(slug),
-    queryFn: () => productsApi.getBySlug(slug),
-    enabled: Boolean(slug),
+    queryKey: QUERY_KEYS.PRODUCT(id),
+    queryFn: () => productsApi.getById(id),
+    enabled: Boolean(id),
     ...options,
   });
 }

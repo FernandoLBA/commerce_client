@@ -53,7 +53,7 @@ export function Rating({
                 <Star
                   className={cn(
                     sizeClasses[size],
-                    'absolute inset-0 text-yellow-400',
+                    'absolute inset-0 text-primary-400',
                     isHalf && 'clip-path-half'
                   )}
                   fill="currentColor"
@@ -135,7 +135,7 @@ export function RatingInput({
             <Star
               className={cn(
                 sizeClasses[size],
-                isSelected ? 'text-yellow-400' : 'text-gray-300'
+                isSelected ? 'text-primary-400' : 'text-gray-300'
               )}
               fill="currentColor"
             />

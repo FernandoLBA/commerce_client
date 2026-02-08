@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { useEffect, useState } from 'react';
 import { STORAGE_KEYS } from '@/constants';
 import type { User } from '@/types';
 
@@ -7,13 +8,11 @@ interface AuthState {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
-  isLoading: boolean;
 }
 
 interface AuthActions {
   setAuth: (user: User, token: string) => void;
   clearAuth: () => void;
-  setLoading: (loading: boolean) => void;
   updateUser: (user: Partial<User>) => void;
 }
 
@@ -23,7 +22,6 @@ const initialState: AuthState = {
   user: null,
   token: null,
   isAuthenticated: false,
-  isLoading: true,
 };
 
 /**
@@ -39,7 +37,6 @@ export const useAuthStore = create<AuthStore>()(
           user,
           token,
           isAuthenticated: true,
-          isLoading: false,
         });
       },
 
@@ -48,12 +45,7 @@ export const useAuthStore = create<AuthStore>()(
           user: null,
           token: null,
           isAuthenticated: false,
-          isLoading: false,
         });
-      },
-
-      setLoading: (isLoading) => {
-        set({ isLoading });
       },
 
       updateUser: (userData) => {
@@ -63,19 +55,35 @@ export const useAuthStore = create<AuthStore>()(
       },
     }),
     {
-      name: STORAGE_KEYS.AUTH_TOKEN,
+      name: STORAGE_KEYS.AUTH_STORE,
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
-        user: state.user,
-        token: state.token,
-        isAuthenticated: state.isAuthenticated,
-      }),
-      onRehydrateStorage: () => (state) => {
-        state?.setLoading(false);
-      },
     }
   )
 );
+
+/**
+ * Hook to check if auth store has hydrated
+ * Uses Zustand's persist API directly
+ */
+export const useAuthHydrated = () => {
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    // Check if already hydrated
+    const unsub = useAuthStore.persist.onFinishHydration(() => {
+      setHydrated(true);
+    });
+
+    // Check immediately in case hydration already finished
+    setHydrated(useAuthStore.persist.hasHydrated());
+
+    return () => {
+      unsub();
+    };
+  }, []);
+
+  return hydrated;
+};
 
 /**
  * Selector for checking if user is admin

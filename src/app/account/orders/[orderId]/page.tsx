@@ -217,7 +217,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
             </span>
           </div>
           {parseFloat(order.discount) > 0 && (
-            <div className="flex justify-between text-green-600">
+            <div className="flex justify-between text-primary-600">
               <span>Descuento</span>
               <span>-{formatCurrency(order.discount)}</span>
             </div>

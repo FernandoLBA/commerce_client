@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   ShoppingCart,
   Heart,
@@ -9,25 +9,44 @@ import {
   Search,
   Menu,
   X,
+  Package,
+  MapPin,
+  Settings,
+  LogOut,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { APP_CONFIG, ROUTES } from '@/constants';
 import { useAuthStore, useCartItemCount, useUIStore } from '@/store';
 import { Button } from '@/components/ui';
 
+const NAV_LINKS = [
+  { href: ROUTES.HOME, label: 'Inicio' },
+  { href: ROUTES.SHOP.PRODUCTS, label: 'Productos' },
+];
+
+const ACCOUNT_LINKS = [
+  { name: 'Mi Perfil', href: ROUTES.USER.PROFILE, icon: User },
+  { name: 'Mis Pedidos', href: ROUTES.USER.ORDERS, icon: Package },
+  { name: 'Direcciones', href: ROUTES.USER.ADDRESSES, icon: MapPin },
+  { name: 'Lista de Deseos', href: ROUTES.USER.WISHLIST, icon: Heart },
+  { name: 'Configuración', href: '/account/settings', icon: Settings },
+];
+
 /**
  * Main navigation header
  */
 export function Header() {
   const pathname = usePathname();
-  const { isAuthenticated } = useAuthStore();
+  const router = useRouter();
+  const { isAuthenticated, clearAuth } = useAuthStore();
   const cartItemCount = useCartItemCount();
   const { isMobileMenuOpen, toggleMobileMenu, openSearch } = useUIStore();
 
-  const navLinks = [
-    { href: ROUTES.HOME, label: 'Inicio' },
-    { href: ROUTES.SHOP.PRODUCTS, label: 'Productos' },
-  ];
+  const handleLogout = () => {
+    clearAuth();
+    toggleMobileMenu();
+    router.push(ROUTES.HOME);
+  };
 
   return (
     <header className="sticky top-0 z-30 border-b border-gray-200 bg-white">
@@ -42,7 +61,7 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex md:items-center md:gap-8">
-            {navLinks.map((link) => (
+            {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -70,7 +89,7 @@ export function Header() {
 
             {/* Wishlist */}
             {isAuthenticated && APP_CONFIG.FEATURES.WISHLIST_ENABLED && (
-              <Link href={ROUTES.USER.WISHLIST}>
+              <Link href={ROUTES.USER.WISHLIST} className="hidden sm:block">
                 <Button variant="ghost" size="icon" aria-label="Lista de deseos">
                   <Heart className="h-5 w-5" />
                 </Button>
@@ -94,9 +113,9 @@ export function Header() {
               </Button>
             </Link>
 
-            {/* User */}
+            {/* User - Desktop only */}
             {isAuthenticated ? (
-              <Link href={ROUTES.USER.PROFILE}>
+              <Link href={ROUTES.USER.PROFILE} className="hidden md:block">
                 <Button variant="ghost" size="icon" aria-label="Mi cuenta">
                   <User className="h-5 w-5" />
                 </Button>
@@ -129,13 +148,19 @@ export function Header() {
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
           <nav className="border-t border-gray-200 py-4 md:hidden">
-            <div className="flex flex-col gap-2">
-              {navLinks.map((link) => (
+            <div className="flex flex-col gap-1">
+              {/* Main navigation */}
+              <div className="mb-2">
+                <span className="px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  Navegación
+                </span>
+              </div>
+              {NAV_LINKS.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+                    'rounded-lg px-4 py-3 text-sm font-medium transition-colors',
                     pathname === link.href
                       ? 'bg-primary-50 text-primary-600'
                       : 'text-gray-700 hover:bg-gray-50'
@@ -145,7 +170,46 @@ export function Header() {
                   {link.label}
                 </Link>
               ))}
-              {!isAuthenticated && (
+
+              {/* Divider */}
+              <div className="my-3 border-t border-gray-200" />
+
+              {/* Account section */}
+              {isAuthenticated ? (
+                <>
+                  <div className="mb-2">
+                    <span className="px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                      Mi Cuenta
+                    </span>
+                  </div>
+                  {ACCOUNT_LINKS.map((link) => {
+                    const isActive = pathname === link.href;
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className={cn(
+                          'flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors',
+                          isActive
+                            ? 'bg-primary-50 text-primary-600'
+                            : 'text-gray-700 hover:bg-gray-50'
+                        )}
+                        onClick={toggleMobileMenu}
+                      >
+                        <link.icon className="h-5 w-5" />
+                        {link.name}
+                      </Link>
+                    );
+                  })}
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+                  >
+                    <LogOut className="h-5 w-5" />
+                    Cerrar Sesión
+                  </button>
+                </>
+              ) : (
                 <Link href={ROUTES.AUTH.LOGIN} onClick={toggleMobileMenu}>
                   <Button variant="primary" className="w-full">
                     Iniciar sesión

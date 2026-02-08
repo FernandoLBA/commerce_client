@@ -14,6 +14,18 @@ export const ROUTES = {
     REGISTER: '/auth/register',
     FORGOT_PASSWORD: '/auth/forgot-password',
     RESET_PASSWORD: '/auth/reset-password',
+    ACTIVATE_NOTIFICATION: '/auth/activate-notification',
+    RESEND_ACTIVATION_EMAIL: '/auth/resend-activation',
+    FORGOT_PASSWORD_NOTIFICATION: '/auth/forgot-password-notification',
+  },
+
+  // Account routes
+  ACCOUNT: {
+    BASE: '/account',
+    PROFILE: '/account/profile',
+    ORDERS: '/account/orders',
+    ADDRESSES: '/account/addresses',
+    WISHLIST: '/account/wishlist',
   },
 
   // Shop routes
@@ -101,22 +113,22 @@ export const TOAST_DURATION = {
 export const ORDER_STATUS_CONFIG = {
   PENDING: {
     label: 'Pendiente',
-    color: 'bg-yellow-100 text-yellow-800',
+    color: 'bg-primary-100 text-primary-800',
     icon: 'Clock',
   },
   CONFIRMED: {
     label: 'Confirmado',
-    color: 'bg-blue-100 text-blue-800',
+    color: 'bg-primary-200 text-primary-900',
     icon: 'CheckCircle',
   },
   PROCESSING: {
     label: 'Procesando',
-    color: 'bg-indigo-100 text-indigo-800',
+    color: 'bg-primary-200 text-primary-800',
     icon: 'Package',
   },
   SHIPPED: {
     label: 'Enviado',
-    color: 'bg-purple-100 text-purple-800',
+    color: 'bg-primary-300 text-primary-900',
     icon: 'Truck',
   },
   DELIVERED: {

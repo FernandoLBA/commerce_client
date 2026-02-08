@@ -1,12 +1,12 @@
 import { API_ENDPOINTS } from '@/constants';
-import { apiClient } from './client';
 import type {
+  ApiResponse,
   AuthResponse,
   LoginCredentials,
   RegisterData,
   User,
-  ApiResponse,
 } from '@/types';
+import { apiClient } from './client';
 
 /**
  * Authentication API service
@@ -43,5 +43,19 @@ export const authApi = {
       { token }
     );
     return response.data.data;
+  },
+
+  /**
+   * Activate user account
+   */
+  activateAccount: async (token: string): Promise<void> => {
+    await apiClient.post(API_ENDPOINTS.AUTH.ACTIVATE, { token });
+  },
+
+  /**
+   * Resend activation email
+   */
+  resendActivationEmail: async (email: string): Promise<void> => {
+    await apiClient.post(API_ENDPOINTS.AUTH.RESEND_ACTIVATION_TOKEN, { email });
   },
 };

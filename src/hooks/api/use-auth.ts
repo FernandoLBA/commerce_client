@@ -1,17 +1,18 @@
+import { STORAGE_KEYS } from '@/constants';
+import { authApi } from '@/lib/api';
+import { setAuthCookie, removeAuthCookie } from '@/lib/cookies';
+import { useAuthStore } from '@/store/auth';
+import type {
+  ApiError,
+  AuthResponse,
+  LoginCredentials,
+  RegisterData,
+} from '@/types';
 import {
   useMutation,
   UseMutationOptions,
 } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { STORAGE_KEYS } from '@/constants';
-import { authApi } from '@/lib/api';
-import { useAuthStore } from '@/store/auth';
-import type {
-  AuthResponse,
-  LoginCredentials,
-  RegisterData,
-  ApiError,
-} from '@/types';
 
 /**
  * Hook for user login
@@ -26,6 +27,7 @@ export function useLogin(
     onSuccess: (data) => {
       localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, data.access_token);
       localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(data.user));
+      setAuthCookie(data.access_token);
       setAuth(data.user, data.access_token);
     },
     ...options,
@@ -45,6 +47,7 @@ export function useRegister(
     onSuccess: (data) => {
       localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, data.access_token);
       localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(data.user));
+      setAuthCookie(data.access_token);
       setAuth(data.user, data.access_token);
     },
     ...options,
@@ -60,6 +63,25 @@ export function useLogout() {
   return () => {
     localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.USER);
+    removeAuthCookie();
     clearAuth();
   };
+}
+
+/**
+ * Hook for account activation
+ */
+export function useActivateAccount() {
+  return useMutation({
+    mutationFn: (token: string) => authApi.activateAccount(token),
+  });
+}
+
+/**
+ * Hook for resending activation email
+ */
+export function useResendActivationEmail() {
+  return useMutation({
+    mutationFn: (email: string) => authApi.resendActivationEmail(email),
+  });
 }

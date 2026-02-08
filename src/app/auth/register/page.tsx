@@ -28,8 +28,8 @@ export default function RegisterPage() {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { confirmPassword, ...registerData } = data;
       await registerMutation.mutateAsync(registerData);
-      toast.success('¡Cuenta creada!', 'Tu cuenta ha sido creada exitosamente');
-      router.push(ROUTES.HOME);
+      toast.success('¡Gracias por registrarte!', 'Te enviamos un mail a tu correo para verificar tu cuenta.');
+      router.push(ROUTES.AUTH.ACTIVATE_NOTIFICATION);
     } catch (error) {
       toast.error('Error', getErrorMessage(error));
     }
@@ -72,15 +72,6 @@ export default function RegisterPage() {
             error={errors.email?.message}
             {...register('email')}
           />
-
-          {/* <Input
-            label="Teléfono (opcional)"
-            type="tel"
-            placeholder="999 999 999"
-            autoComplete="tel"
-            error={errors.phone?.message}
-            {...register('phone')}
-          /> */}
 
           <Input
             label="Contraseña"

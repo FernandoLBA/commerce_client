@@ -18,6 +18,7 @@ import {
 
 import { useCart, useAddresses, useCreateOrder } from '@/hooks/api';
 import { useAuthStore, useUIStore } from '@/store';
+import { useAuthHydrated } from '@/store/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loading } from '@/components/ui/loading';
@@ -91,6 +92,7 @@ const FREE_SHIPPING_THRESHOLD = 50;
 export default function CheckoutPage() {
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
+  const hasHydrated = useAuthHydrated();
   const { addToast } = useUIStore();
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -117,10 +119,10 @@ export default function CheckoutPage() {
 
   // Redirect if not authenticated
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push(`${ROUTES.AUTH.LOGIN}?redirect=${ROUTES.CHECKOUT.CHECKOUT}`);
+    if (hasHydrated && !isAuthenticated) {
+      router.replace(`${ROUTES.AUTH.LOGIN}?redirect=${ROUTES.CHECKOUT.CHECKOUT}`);
     }
-  }, [isAuthenticated, router]);
+  }, [hasHydrated, isAuthenticated, router]);
 
   // Auto-select default address
   useEffect(() => {

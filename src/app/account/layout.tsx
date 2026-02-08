@@ -14,7 +14,7 @@ import { useEffect } from 'react';
 
 import { Loading } from '@/components/ui/loading';
 import { ROUTES } from '@/constants/ui';
-import { useAuthStore } from '@/store/auth';
+import { useAuthStore, useAuthHydrated } from '@/store/auth';
 
 const ACCOUNT_NAVIGATION = [
   { name: 'Mi Perfil', href: ROUTES.USER.PROFILE, icon: User },
@@ -31,28 +31,23 @@ interface AccountLayoutProps {
 export default function AccountLayout({ children }: AccountLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, isAuthenticated, isLoading, clearAuth } = useAuthStore();
+  const { user, isAuthenticated, clearAuth } = useAuthStore();
+  const hasHydrated = useAuthHydrated();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push(`${ROUTES.AUTH.LOGIN}?redirect=${pathname}`);
+    // Only redirect after hydration is complete and user is definitely not authenticated
+    if (hasHydrated && !isAuthenticated) {
+      router.replace(`${ROUTES.AUTH.LOGIN}?redirect=${pathname}`);
     }
-  }, [isLoading, isAuthenticated, router, pathname]);
+  }, [hasHydrated, isAuthenticated, router, pathname]);
 
   const handleLogout = () => {
     clearAuth();
     router.push(ROUTES.HOME);
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loading />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
+  // Show loading while hydrating OR while not authenticated (before redirect)
+  if (!hasHydrated || !isAuthenticated) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Loading />
@@ -61,21 +56,22 @@ export default function AccountLayout({ children }: AccountLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4">
-        <div className="mb-8">
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-6 lg:py-8">
+        {/* Header - visible on all screens */}
+        <div className="mb-6 lg:mb-8">
           <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
             Mi Cuenta
           </h1>
-          <p className="mt-1 text-gray-600">
+          <p className="mt-1 text-sm text-gray-600 sm:text-base">
             Bienvenido, {user?.firstName || user?.email}
           </p>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-4">
-          {/* Sidebar navigation */}
-          <aside className="lg:col-span-1">
-            <nav className="rounded-xl bg-white p-4 shadow-sm">
+          {/* Desktop Sidebar navigation - hidden on mobile */}
+          <aside className="hidden lg:col-span-1 lg:block">
+            <nav className="sticky top-24 rounded-xl bg-white p-4 shadow-sm">
               <ul className="space-y-1">
                 {ACCOUNT_NAVIGATION.map((item) => {
                   const isActive = pathname === item.href;

@@ -1,5 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 import { APP_CONFIG, STORAGE_KEYS, HTTP_STATUS } from '@/constants';
+import { removeAuthCookie } from '@/lib/cookies';
 import type { ApiError } from '@/types';
 
 /**
@@ -42,6 +43,7 @@ apiClient.interceptors.response.use(
       if (typeof window !== 'undefined') {
         localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
         localStorage.removeItem(STORAGE_KEYS.USER);
+        removeAuthCookie();
         
         // Redirect to login if not already there
         if (!window.location.pathname.startsWith('/auth')) {

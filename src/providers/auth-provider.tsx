@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { STORAGE_KEYS } from '@/constants';
+import { setAuthCookie, removeAuthCookie } from '@/lib/cookies';
 import { useAuthStore } from '@/store';
 
 interface AuthProviderProps {
@@ -9,32 +9,20 @@ interface AuthProviderProps {
 }
 
 /**
- * Auth provider that hydrates auth state from localStorage
+ * Auth provider that syncs the auth cookie for middleware protection
+ * The actual hydration is handled by Zustand persist
  */
 export function AuthProvider({ children }: AuthProviderProps) {
-  const { setAuth, setLoading, clearAuth } = useAuthStore();
+  const { token, isAuthenticated } = useAuthStore();
 
   useEffect(() => {
-    const initAuth = () => {
-      try {
-        const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
-        const userStr = localStorage.getItem(STORAGE_KEYS.USER);
-
-        if (token && userStr) {
-          const user = JSON.parse(userStr);
-          setAuth(user, token);
-        } else {
-          clearAuth();
-        }
-      } catch {
-        clearAuth();
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initAuth();
-  }, [setAuth, setLoading, clearAuth]);
+    // Sync cookie with auth state for middleware protection
+    if (isAuthenticated && token) {
+      setAuthCookie(token);
+    } else {
+      removeAuthCookie();
+    }
+  }, [isAuthenticated, token]);
 
   return <>{children}</>;
 }

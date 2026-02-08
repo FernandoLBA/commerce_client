@@ -54,7 +54,6 @@ export default function HomePage() {
   const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
 
   const products: Product[] = productsData ?? [];
-  console.log("🚀 ~ HomePage ~ products:", products)
   const categories: Category[] = categoriesData?.slice(0, CATEGORIES_LIMIT) ?? [];
 
   return (

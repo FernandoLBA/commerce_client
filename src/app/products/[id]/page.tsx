@@ -4,7 +4,7 @@ import { use, useState } from 'react';
 import Image from 'next/image';
 import { Heart, ShoppingCart, Minus, Plus, Check } from 'lucide-react';
 import { Button, Badge, Rating, Loading } from '@/components/ui';
-import { useProductBySlug, useAddToCart, useAddToWishlist } from '@/hooks';
+import { useProductById, useAddToCart, useAddToWishlist } from '@/hooks';
 import { formatCurrency, calculateDiscountPercentage, cn } from '@/lib/utils';
 import { APP_CONFIG } from '@/constants';
 import { toast } from '@/store';
@@ -12,12 +12,12 @@ import { getErrorMessage } from '@/lib/api';
 import type { ProductVariant } from '@/types';
 
 interface ProductPageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ id: string }>;
 }
 
 export default function ProductPage({ params }: ProductPageProps) {
   const resolvedParams = use(params);
-  const { data: product, isLoading } = useProductBySlug(resolvedParams.slug);
+  const { data: product, isLoading } = useProductById(resolvedParams.id);
   const addToCart = useAddToCart();
   const addToWishlist = useAddToWishlist();
 

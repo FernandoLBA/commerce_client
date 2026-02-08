@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Grid3X3, List, SlidersHorizontal } from 'lucide-react';
-import { Button, ProductGridSkeleton, Badge } from '@/components/ui';
-import { useProducts, useCategories } from '@/hooks';
-import { formatCurrency, calculateDiscountPercentage, cn } from '@/lib/utils';
+import { Badge, Button, ProductGridSkeleton } from '@/components/ui';
 import { ROUTES } from '@/constants';
+import { useCategories, useProducts } from '@/hooks';
+import { calculateDiscountPercentage, cn, formatCurrency } from '@/lib/utils';
+import { Grid3X3, List, SlidersHorizontal } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useState } from 'react';
 
 type ViewMode = 'grid' | 'list';
 
@@ -123,7 +123,7 @@ export default function ProductsPage() {
                 return (
                   <Link
                     key={product.id}
-                    href={ROUTES.SHOP.PRODUCT_DETAIL(product.slug)}
+                    href={ROUTES.SHOP.PRODUCT_DETAIL(product.id)}
                     className={cn(
                       'group overflow-hidden rounded-lg border border-gray-200 bg-white transition-shadow hover:shadow-md',
                       viewMode === 'list' ? 'flex' : ''

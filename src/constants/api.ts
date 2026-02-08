@@ -8,6 +8,8 @@ export const API_ENDPOINTS = {
     REGISTER: '/auth/register',
     LOGIN: '/auth/login',
     VALIDATE: '/auth/validate',
+    ACTIVATE: '/auth/activate',
+    RESEND_ACTIVATION_TOKEN: '/auth/resend-activation',
   },
 
   // Users

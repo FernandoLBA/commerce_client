@@ -60,7 +60,68 @@ src/
 - **Container/Presentational**: Separar lógica de presentación
 - **Barrel Exports**: Usar archivos `index.ts` para exportaciones limpias
 
-### 4. Performance
+### 4. Organización de Constantes, Tipos e Interfaces
+
+#### Regla General: Colocación por Alcance de Uso
+
+| Elemento | Alcance | Ubicación |
+|----------|---------|-----------|
+| Constantes usadas en **1 archivo** | Local | En el mismo archivo, antes del componente |
+| Constantes **compartidas** entre componentes | Global | `/constants/` |
+| Types/Interfaces de **props de componente** | Local | En el mismo archivo del componente |
+| Types/Interfaces del **dominio** (User, Product) | Global | `/types/` |
+| Configuración de la **app** | Global | `/constants/app.ts` (APP_CONFIG) |
+| Configuración de **UI** (rutas, breakpoints) | Global | `/constants/ui.ts` |
+
+#### Ejemplos
+
+```typescript
+// ✅ CORRECTO: Constantes locales en el mismo archivo
+// src/app/page.tsx
+const HERO_CONTENT = {
+  title: 'Bienvenido',
+  subtitle: 'Explora nuestra tienda',
+};
+
+const FEATURED_PRODUCTS_LIMIT = 8;
+
+export default function HomePage() { ... }
+```
+
+```typescript
+// ✅ CORRECTO: Props interface junto al componente
+// src/components/ui/button.tsx
+interface ButtonProps {
+  variant?: 'primary' | 'secondary' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  children: React.ReactNode;
+}
+
+export function Button({ variant, size, children }: ButtonProps) { ... }
+```
+
+```typescript
+// ✅ CORRECTO: Tipos del dominio en /types/
+// src/types/product.ts
+export interface Product {
+  id: string;
+  name: string;
+  price: number;
+}
+```
+
+```typescript
+// ❌ EVITAR: Sobre-ingeniería - no separar si solo se usa en un lugar
+// No crear /constants/home-page.ts solo para HERO_CONTENT
+```
+
+#### Cuándo Mover a /constants/
+1. La constante se usa en **2+ archivos diferentes**
+2. Es **configuración global** de la aplicación
+3. Necesita ser **modificada frecuentemente** (centralizar cambios)
+4. Es parte de un **enum o mapeo** usado en múltiples lugares
+
+### 5. Performance
 - Lazy loading de componentes con `dynamic()` o `React.lazy()`
 - Memoización estratégica (`useMemo`, `useCallback`, `React.memo`)
 - Optimización de imágenes con `next/image`

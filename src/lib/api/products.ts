@@ -20,7 +20,6 @@ export const productsApi = {
       API_ENDPOINTS.PRODUCTS.BASE,
       { params }
     );
-    console.log("🚀 ~ response:", response)
     return response.data.data;
   },
 

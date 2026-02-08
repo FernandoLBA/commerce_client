@@ -6,11 +6,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { User, Mail, Phone, Edit2, Save, X } from 'lucide-react';
 
 import { useUpdateProfile, useProfile } from '@/hooks/api';
-import { useAuthStore } from '@/store';
-import { useUIStore } from '@/store';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Skeleton } from '@/components/ui/loading';
+import { useAuthStore, useUIStore } from '@/store';
+import { Button, Input, Skeleton } from '@/components/ui';
 import { profileSchema } from '@/lib/validations';
 import type { UpdateProfileData } from '@/types';
 
