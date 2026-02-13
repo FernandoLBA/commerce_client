@@ -221,7 +221,7 @@ export default function HomePage() {
                   : 0;
 
                 return (
-                  <Link key={product.id} href={`${ROUTES.SHOP.PRODUCTS}/${product.slug}`}>
+                  <Link key={product.id} href={`${ROUTES.SHOP.PRODUCTS}/${product.id}`}>
                     <div className="group overflow-hidden rounded-xl bg-white shadow-sm transition-all hover:shadow-md">
                       <div className="relative aspect-square overflow-hidden bg-gray-100">
                         {product.images && product.images.length > 0 && product.images[0] ? (

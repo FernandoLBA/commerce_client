@@ -7,7 +7,8 @@
     "build:dev": "next build && next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "reinstall": "rm -rf node_modules pnpm-lock.yaml .next && pnpm install && pnpm prune"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -27,7 +28,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@tanstack/eslint-plugin-query": "^5.91.4",
-    "@types/node": "^20",
+    "@types/node": "^20.19.33",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

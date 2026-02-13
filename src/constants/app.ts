@@ -40,7 +40,7 @@ export const APP_CONFIG = {
     REVIEWS_ENABLED: process.env.NEXT_PUBLIC_ENABLE_REVIEWS === 'true',
     WISHLIST_ENABLED: process.env.NEXT_PUBLIC_ENABLE_WISHLIST === 'true',
   },
-} as const;
+};
 
 /**
  * Local storage keys

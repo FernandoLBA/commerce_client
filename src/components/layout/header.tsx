@@ -1,23 +1,25 @@
 'use client';
 
+import { Button } from '@/components/ui';
+import { APP_CONFIG, ROUTES } from '@/constants';
+import { cn } from '@/lib/utils';
+import { useAuthStore, useCartItemCount, useUIStore } from '@/store';
+import {
+  Heart,
+  LogOut,
+  MapPin,
+  Menu,
+  Package,
+  Search,
+  Settings,
+  ShoppingCart,
+  User,
+  X,
+} from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import {
-  ShoppingCart,
-  Heart,
-  User,
-  Search,
-  Menu,
-  X,
-  Package,
-  MapPin,
-  Settings,
-  LogOut,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { APP_CONFIG, ROUTES } from '@/constants';
-import { useAuthStore, useCartItemCount, useUIStore } from '@/store';
-import { Button } from '@/components/ui';
+import { logo } from '../../../public/images';
 
 const NAV_LINKS = [
   { href: ROUTES.HOME, label: 'Inicio' },
@@ -55,7 +57,8 @@ export function Header() {
           {/* Logo */}
           <div className="flex items-center">
             <Link href={ROUTES.HOME} className="text-xl font-bold text-primary-600">
-              {APP_CONFIG.NAME}
+            <Image src={logo} alt="Logo" className="h-50 w-auto mr-2" />
+              {/* {APP_CONFIG.NAME} */}
             </Link>
           </div>
 

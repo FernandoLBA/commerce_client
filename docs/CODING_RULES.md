@@ -124,7 +124,8 @@ interface User {
 }
 
 // Type para unions
-type ButtonVariant = 'primary' | 'secondary' | 'outline';
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+type ButtonSize = 'sm' | 'md' | 'lg';
 
 // Type para utilidades
 type PartialUser = Partial<User>;
@@ -144,6 +145,7 @@ enum OrderStatus {
   PROCESSING = 'PROCESSING',
   SHIPPED = 'SHIPPED',
   DELIVERED = 'DELIVERED',
+  CANCELLED = 'CANCELLED',
 }
 ```
 
@@ -843,3 +845,12 @@ fix/login-error   # Corrección
 - [ ] Código documentado cuando es complejo
 - [ ] Imports ordenados
 - [ ] Sin console.log en producción
+
+---
+
+## Reglas Visuales para Flujos de Autenticación
+
+- Todas las páginas de flujos de autenticación (recuperación de contraseña, activación de cuenta, etc.) deben mostrar un ícono visual relevante arriba del título principal.
+- El ícono debe estar dentro de un círculo de color (ejemplo: azul, verde, amarillo) y debe ser representativo del estado o acción (por ejemplo: mail, check, spinner).
+- Esta regla aplica tanto para estados de éxito, formulario inicial y loading.
+- El objetivo es mejorar la comprensión del usuario y mantener consistencia visual en todos los flujos.
