@@ -9,3 +9,6 @@ export * from './order';
 export * from './wishlist';
 export * from './review';
 export * from './coupon';
+
+// Admin types
+export * from './admin';

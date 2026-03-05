@@ -1,7 +1,7 @@
-import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
-import { APP_CONFIG, STORAGE_KEYS, HTTP_STATUS } from '@/constants';
+import { APP_CONFIG, HTTP_STATUS, STORAGE_KEYS } from '@/constants';
 import { removeAuthCookie } from '@/lib/cookies';
 import type { ApiError } from '@/types';
+import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
 /**
  * Axios instance configured for the API
@@ -80,8 +80,8 @@ export async function apiRequest<T>(
 export function getErrorMessage(error: unknown): string {
   if (axios.isAxiosError(error)) {
     const apiError = error.response?.data as ApiError | undefined;
-    if (apiError?.message) {
-      return Array.isArray(apiError.message) ? apiError.message[0] ?? error.message : apiError.message;
+    if (apiError?.error?.message) {
+      return Array.isArray(apiError.error.message) ? apiError.error.message[0] ?? error.message : apiError.error.message;
     }
     return error.message;
   }

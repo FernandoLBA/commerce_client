@@ -297,8 +297,8 @@ export default function CheckoutPage() {
                             {address.city}, {address.department} {address.postalCode}
                           </p>
                           <p className="text-sm text-gray-600">{address.district}</p>
-                          {address.phone && (
-                            <p className="text-sm text-gray-500">{address.phone}</p>
+                          {address.recipientPhone && (
+                            <p className="text-sm text-gray-500">{address.recipientPhone}</p>
                           )}
                           {address.isDefault && (
                             <span className="mt-2 inline-block rounded bg-gray-100 px-2 py-1 text-xs text-gray-600">

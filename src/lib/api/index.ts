@@ -10,3 +10,4 @@ export { ordersApi } from './orders';
 export { usersApi } from './users';
 export { wishlistApi } from './wishlist';
 export { reviewsApi } from './reviews';
+export { adminApi } from './admin';

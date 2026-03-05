@@ -2,8 +2,9 @@
 
 import { Button } from '@/components/ui';
 import { APP_CONFIG, ROUTES } from '@/constants';
+import { useCart } from '@/hooks';
 import { cn } from '@/lib/utils';
-import { useAuthStore, useCartItemCount, useUIStore } from '@/store';
+import { useAuthStore, useUIStore } from '@/store';
 import {
   Heart,
   LogOut,
@@ -41,7 +42,8 @@ export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, clearAuth } = useAuthStore();
-  const cartItemCount = useCartItemCount();
+  const { data: cart } = useCart();
+  const cartItemCount = cart?.itemCount ?? 0;
   const { isMobileMenuOpen, toggleMobileMenu, openSearch } = useUIStore();
 
   const handleLogout = () => {
@@ -109,7 +111,7 @@ export function Header() {
               >
                 <ShoppingCart className="h-5 w-5" />
                 {cartItemCount > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary-600 text-xs font-medium text-white">
+                  <span className={`absolute -right-1 -top-1 flex ${cartItemCount > 99 ? 'text-[8px]' : 'text-xs'} h-5 w-5 items-center justify-center rounded-full bg-primary-600 font-bold text-white`}>
                     {cartItemCount > 99 ? '99+' : cartItemCount}
                   </span>
                 )}

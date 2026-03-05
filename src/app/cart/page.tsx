@@ -92,7 +92,7 @@ export default function CartPage() {
               <div key={item.id} className="flex gap-4 p-4 sm:p-6">
                 {/* Image */}
                 <Link
-                  href={ROUTES.SHOP.PRODUCT_DETAIL(item.product.slug)}
+                  href={ROUTES.SHOP.PRODUCT_DETAIL(item.product.id)}
                   className="relative h-24 w-24 shrink-0 overflow-hidden rounded-md bg-gray-100 sm:h-32 sm:w-32"
                 >
                   {item.product.images?.[0] ? (
@@ -114,7 +114,7 @@ export default function CartPage() {
                 <div className="flex flex-1 flex-col justify-between">
                   <div>
                     <Link
-                      href={ROUTES.SHOP.PRODUCT_DETAIL(item.product.slug)}
+                      href={ROUTES.SHOP.PRODUCT_DETAIL(item.product.id)}
                       className="font-medium text-gray-900 hover:text-primary-600"
                     >
                       {item.product.name}
@@ -198,7 +198,7 @@ export default function CartPage() {
             <div className="mt-6 space-y-4">
               <div className="flex justify-between text-gray-600">
                 <span>Subtotal ({cart.itemCount} items)</span>
-                <span>{formatCurrency(cart.subtotal)}</span>
+                <span>{formatCurrency(cart.total)}</span>
               </div>
               <div className="flex justify-between text-gray-600">
                 <span>Envío</span>
@@ -207,7 +207,7 @@ export default function CartPage() {
               <div className="border-t border-gray-200 pt-4">
                 <div className="flex justify-between text-lg font-semibold text-gray-900">
                   <span>Total</span>
-                  <span>{formatCurrency(cart.subtotal)}</span>
+                  <span>{formatCurrency(cart.total)}</span>
                 </div>
               </div>
             </div>

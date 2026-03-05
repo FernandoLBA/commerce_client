@@ -25,7 +25,7 @@ export interface Address extends BaseEntity {
   userId: string;
   label: string;
   recipientName: string;
-  phone: string;
+  recipientPhone: string;
   street: string;
   number: string | null;
   apartment: string | null;
@@ -79,7 +79,7 @@ export interface UpdateProfileData {
 export interface CreateAddressData {
   label: string;
   recipientName: string;
-  phone: string;
+  recipientPhone: string;
   street: string;
   number?: string;
   apartment?: string;

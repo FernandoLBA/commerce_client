@@ -26,7 +26,7 @@ export interface CartItem extends BaseEntity {
  * Cart with calculated totals
  */
 export interface CartWithTotals extends Cart {
-  subtotal: number;
+  total: number;
   itemCount: number;
 }
 

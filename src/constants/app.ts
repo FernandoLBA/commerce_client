@@ -100,6 +100,15 @@ export const QUERY_KEYS = {
 
   // Shipping
   SHIPPING_RATES: ['shipping', 'rates'],
+
+  // Admin
+  ADMIN_STATS: ['admin', 'stats'],
+  ADMIN_PRODUCTS: (filters?: unknown) => ['admin', 'products', filters],
+  ADMIN_PRODUCT: (id: string) => ['admin', 'products', id],
+  ADMIN_ORDERS: (filters?: unknown) => ['admin', 'orders', filters],
+  ADMIN_ORDER: (id: string) => ['admin', 'orders', id],
+  ADMIN_USERS: (filters?: unknown) => ['admin', 'users', filters],
+  ADMIN_REVIEWS: (filters?: unknown) => ['admin', 'reviews', filters],
 } as const;
 
 /**

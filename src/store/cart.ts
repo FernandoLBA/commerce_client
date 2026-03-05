@@ -98,14 +98,6 @@ export const useCartStore = create<CartStore>()((set) => ({
 }));
 
 /**
- * Selector for cart item count
- */
-export const useCartItemCount = (): number =>
-  useCartStore((state) =>
-    state.items.reduce((sum, item) => sum + item.quantity, 0)
-  );
-
-/**
  * Selector for cart subtotal
  */
 export const useCartSubtotal = (): number =>

@@ -9,3 +9,6 @@ export * from './use-orders';
 export * from './use-users';
 export * from './use-wishlist';
 export * from './use-reviews';
+
+// Admin hooks
+export * from './use-admin';

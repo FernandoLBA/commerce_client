@@ -87,4 +87,13 @@ export const API_ENDPOINTS = {
     RATES: '/shipping/rates',
     TRACK: (trackingNumber: string) => `/shipping/track/${trackingNumber}`,
   },
+
+  // Admin
+  ADMIN: {
+    STATS: '/admin/stats',
+    USERS: '/admin/users',
+    USER_BY_ID: (id: string) => `/admin/users/${id}`,
+    REVIEWS: '/admin/reviews',
+    REVIEW_APPROVE: (id: string) => `/admin/reviews/${id}/approve`,
+  },
 } as const;

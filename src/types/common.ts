@@ -63,7 +63,15 @@ export interface PaginatedResponse<T> {
 export interface ApiError {
   statusCode: number;
   message: string | string[];
-  error?: string;
+  error?: ApiErrorDetail;
+}
+
+/**
+ * API error response details
+ */
+export interface ApiErrorDetail {
+  code: string;
+  message: string;
 }
 
 /**

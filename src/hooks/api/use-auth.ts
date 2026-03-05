@@ -86,12 +86,18 @@ export function useResendActivationEmail() {
   });
 }
 
+/**
+ * Hook for initiating the forgot password process
+ */
 export function useForgotPassword() {
   return useMutation({
     mutationFn: (email: string) => authApi.forgotPassword(email),
   });
 }
 
+/**
+ * Hook for resetting the password
+ */
 export function useResetPassword() {
   return useMutation({
     mutationFn: ({ token, password }: { token: string; password: string }) =>

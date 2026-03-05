@@ -62,6 +62,22 @@ export const ROUTES = {
     PRIVACY: '/privacy',
     FAQ: '/faq',
   },
+
+  // Backoffice routes (admin)
+  BACKOFFICE: {
+    BASE: '/backoffice',
+    DASHBOARD: '/backoffice',
+    PRODUCTS: '/backoffice/products',
+    PRODUCT_NEW: '/backoffice/products/new',
+    PRODUCT_EDIT: (id: string) => `/backoffice/products/${id}`,
+    CATEGORIES: '/backoffice/categories',
+    CATEGORY_NEW: '/backoffice/categories/new',
+    CATEGORY_EDIT: (id: string) => `/backoffice/categories/${id}`,
+    ORDERS: '/backoffice/orders',
+    ORDER_DETAIL: (id: string) => `/backoffice/orders/${id}`,
+    USERS: '/backoffice/users',
+    REVIEWS: '/backoffice/reviews',
+  },
 } as const;
 
 /**

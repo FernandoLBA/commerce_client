@@ -1,29 +1,29 @@
 'use client';
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
+  Briefcase,
+  Edit2,
+  Home,
   MapPin,
   Plus,
-  Edit2,
   Trash2,
-  Home,
-  Briefcase,
 } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/loading';
+import { Modal } from '@/components/ui/modal';
 import {
   useAddresses,
   useCreateAddress,
-  useUpdateAddress,
   useDeleteAddress,
+  useUpdateAddress,
 } from '@/hooks/api';
-import { useUIStore } from '@/store';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Modal } from '@/components/ui/modal';
-import { Skeleton } from '@/components/ui/loading';
 import { addressSchema, type AddressFormData } from '@/lib/validations';
+import { useUIStore } from '@/store';
 import type { Address, CreateAddressData } from '@/types';
 
 export default function AddressesPage() {
@@ -56,7 +56,7 @@ export default function AddressesPage() {
       reset({
         label: address.label,
         recipientName: address.recipientName,
-        phone: address.phone,
+        recipientPhone: address.recipientPhone,
         street: address.street,
         number: address.number || '',
         apartment: address.apartment || '',
@@ -72,7 +72,7 @@ export default function AddressesPage() {
       reset({
         label: '',
         recipientName: '',
-        phone: '',
+        recipientPhone: '',
         street: '',
         number: '',
         apartment: '',
@@ -225,8 +225,8 @@ export default function AddressesPage() {
           <Input
             label="Teléfono"
             type="tel"
-            {...register('phone')}
-            error={errors.phone?.message}
+            {...register('recipientPhone')}
+            error={errors.recipientPhone?.message}
           />
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -373,7 +373,7 @@ function AddressCard({ address, onEdit, onDelete }: AddressCardProps) {
           {address.city}, {address.department} {address.postalCode}
         </p>
         <p>{address.district}</p>
-        {address.phone && <p className="mt-2">{address.phone}</p>}
+        {address.recipientPhone && <p className="mt-2">{address.recipientPhone}</p>}
       </div>
 
       <div className="mt-4 flex gap-2">
