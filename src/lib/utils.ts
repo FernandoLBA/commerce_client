@@ -1,6 +1,6 @@
+import { APP_CONFIG } from '@/constants';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { APP_CONFIG } from '@/constants';
 
 /**
  * Merge Tailwind CSS classes with clsx
@@ -161,4 +161,15 @@ export function generateId(prefix = ''): string {
   const timestamp = Date.now().toString(36);
   const randomPart = Math.random().toString(36).substring(2, 9);
   return prefix ? `${prefix}-${timestamp}-${randomPart}` : `${timestamp}-${randomPart}`;
+}
+
+/**
+ * Format file size
+ */
+export function formatFileSize(bytes: number): string{
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
 }

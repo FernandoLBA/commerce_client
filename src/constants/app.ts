@@ -69,7 +69,7 @@ export const QUERY_KEYS = {
 
   // Categories
   CATEGORIES: ['categories'],
-  CATEGORY: (id: string) => ['categories', id],
+  CATEGORY: (slug: string) => ['categories', slug],
 
   // Cart
   CART: ['cart'],
@@ -141,4 +141,8 @@ export const VALIDATION = {
   PHONE_MAX_LENGTH: 15,
   REVIEW_TITLE_MAX_LENGTH: 100,
   REVIEW_COMMENT_MAX_LENGTH: 1000,
+} as const;
+
+export const FILE_SIZES = {
+  IMAGE: 1 * 1024 * 1024,
 } as const;

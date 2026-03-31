@@ -1,15 +1,16 @@
 'use client';
 
+import { yupResolver } from '@hookform/resolvers/yup';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm, type Resolver } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+
 import { Button, Input, Spinner } from '@/components/ui';
-import { useCreateProduct, useCategories } from '@/hooks';
+import { ROUTES } from '@/constants';
+import { useCategories, useCreateProduct } from '@/hooks';
 import { getErrorMessage } from '@/lib/api';
 import { toast } from '@/store';
-import { ROUTES } from '@/constants';
-import Link from 'next/link';
 
 const productSchema = yup.object({
   name: yup.string().required('El nombre es requerido').min(2, 'Mínimo 2 caracteres'),

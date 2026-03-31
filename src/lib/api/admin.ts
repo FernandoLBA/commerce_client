@@ -1,26 +1,26 @@
 import { API_ENDPOINTS } from '@/constants';
-import { apiClient } from './client';
 import type {
+  AdminOrderFilters,
+  AdminProductFilters,
+  AdminReviewFilters,
+  AdminStats,
+  AdminUpdateUserData,
+  AdminUserFilters,
+  ApiResponse,
+  Category,
+  CreateCategoryData,
+  CreateProductData,
+  Order,
+  PaginatedResponse,
   Product,
   ProductWithDetails,
-  Category,
-  Order,
   Review,
-  User,
-  PaginatedResponse,
-  ApiResponse,
-  AdminStats,
-  CreateProductData,
-  UpdateProductData,
-  CreateCategoryData,
   UpdateCategoryData,
   UpdateOrderData,
-  AdminUpdateUserData,
-  AdminProductFilters,
-  AdminOrderFilters,
-  AdminUserFilters,
-  AdminReviewFilters,
+  UpdateProductData,
+  User,
 } from '@/types';
+import { apiClient } from './client';
 
 /**
  * Admin API service
@@ -82,24 +82,24 @@ export const adminApi = {
   },
 
   /**
-   * Update an existing product
+   * Update an existing product by slug
    */
   updateProduct: async (
-    id: string,
+    slug: string,
     data: UpdateProductData
   ): Promise<ProductWithDetails> => {
     const response = await apiClient.patch<ApiResponse<ProductWithDetails>>(
-      API_ENDPOINTS.PRODUCTS.BY_ID(id),
+      API_ENDPOINTS.PRODUCTS.BY_SEARCH(slug),
       data
     );
     return response.data.data;
   },
 
   /**
-   * Delete a product
+   * Delete a product by slug
    */
-  deleteProduct: async (id: string): Promise<void> => {
-    await apiClient.delete(API_ENDPOINTS.PRODUCTS.BY_ID(id));
+  deleteProduct: async (slug: string): Promise<void> => {
+    await apiClient.delete(API_ENDPOINTS.PRODUCTS.BY_SEARCH(slug));
   },
 
   // ── Categories ───────────────────────────────────────────────────────────
@@ -119,21 +119,36 @@ export const adminApi = {
    * Update an existing category
    */
   updateCategory: async (
-    id: string,
+    slug: string,
     data: UpdateCategoryData
   ): Promise<Category> => {
     const response = await apiClient.patch<ApiResponse<Category>>(
-      API_ENDPOINTS.CATEGORIES.BY_ID(id),
+      API_ENDPOINTS.CATEGORIES.BY_SEARCH(slug),
       data
     );
     return response.data.data;
   },
 
   /**
+   * Upload category's image file
+   */
+  uploadCategoryImage: async(slug: string, file: File): Promise<Category> => {
+    const formData = new FormData();
+    formData.append('file', file)
+    const response = await apiClient.patch<ApiResponse<Category>>(
+      API_ENDPOINTS.CATEGORIES.UPLOAD_IMAGE(slug),
+      formData,
+      { headers: { 'Content-Type': file.type } }
+    );
+
+    return response.data.data;
+  },
+
+  /**
    * Delete a category
    */
-  deleteCategory: async (id: string): Promise<void> => {
-    await apiClient.delete(API_ENDPOINTS.CATEGORIES.BY_ID(id));
+  deleteCategory: async (slug: string): Promise<void> => {
+    await apiClient.delete(API_ENDPOINTS.CATEGORIES.BY_SEARCH(slug));
   },
 
   // ── Orders ───────────────────────────────────────────────────────────────

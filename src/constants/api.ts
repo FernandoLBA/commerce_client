@@ -25,14 +25,14 @@ export const API_ENDPOINTS = {
   // Products
   PRODUCTS: {
     BASE: '/products',
-    BY_ID: (id: string) => `/products/${id}`,
-    BY_SLUG: (slug: string) => `/products/slug/${slug}`,
+    BY_SEARCH: (search: string) => `/products/${search}`,
   },
 
   // Categories
   CATEGORIES: {
     BASE: '/categories',
-    BY_ID: (id: string) => `/categories/${id}`,
+    BY_SEARCH: (slug: string) => `/categories/${slug}`,
+    UPLOAD_IMAGE: (slug: string) => `/categories/${slug}/files/upload`
   },
 
   // Cart

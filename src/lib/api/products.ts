@@ -1,12 +1,12 @@
 import { API_ENDPOINTS } from '@/constants';
-import { apiClient } from './client';
 import type {
-  Product,
-  ProductWithDetails,
-  ProductFilterParams,
-  PaginatedResponse,
   ApiResponse,
+  PaginatedResponse,
+  Product,
+  ProductFilterParams,
+  ProductWithDetails,
 } from '@/types';
+import { apiClient } from './client';
 
 /**
  * Products API service
@@ -37,21 +37,11 @@ export const productsApi = {
   },
 
   /**
-   * Get single product by ID
+   * Get single product by ID or slug
    */
-  getById: async (id: string): Promise<ProductWithDetails> => {
+  getByIdOrSlug: async (search: string): Promise<ProductWithDetails> => {
     const response = await apiClient.get<ApiResponse<ProductWithDetails>>(
-      API_ENDPOINTS.PRODUCTS.BY_ID(id)
-    );
-    return response.data.data;
-  },
-
-  /**
-   * Get single product by slug
-   */
-  getBySlug: async (slug: string): Promise<ProductWithDetails> => {
-    const response = await apiClient.get<ApiResponse<ProductWithDetails>>(
-      API_ENDPOINTS.PRODUCTS.BY_SLUG(slug)
+      API_ENDPOINTS.PRODUCTS.BY_SEARCH(search)
     );
     return response.data.data;
   },

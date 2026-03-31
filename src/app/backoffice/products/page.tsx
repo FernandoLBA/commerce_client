@@ -35,9 +35,9 @@ export default function BackofficeProductsPage() {
     }
   };
 
-  const handleToggleActive = async (id: string, currentState: boolean) => {
+  const handleToggleActive = async (slug: string, currentState: boolean) => {
     try {
-      await updateProduct.mutateAsync({ id, data: { isActive: !currentState } });
+      await updateProduct.mutateAsync({ slug, data: { isActive: !currentState } });
       toast.success('Actualizado', `Producto ${!currentState ? 'activado' : 'desactivado'}`);
     } catch (error) {
       toast.error('Error', getErrorMessage(error));
@@ -111,7 +111,7 @@ export default function BackofficeProductsPage() {
                   <tr key={product.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3 font-medium text-gray-900">
                       <Link
-                        href={ROUTES.BACKOFFICE.PRODUCT_EDIT(product.id)}
+                        href={ROUTES.BACKOFFICE.PRODUCT_EDIT(product.slug)}
                         className="hover:text-primary-600 hover:underline"
                       >
                         {product.name}
@@ -136,7 +136,7 @@ export default function BackofficeProductsPage() {
                     </td>
                     <td className="px-4 py-3 text-center">
                       <button
-                        onClick={() => handleToggleActive(product.id, product.isActive)}
+                        onClick={() => handleToggleActive(product.slug, product.isActive)}
                         className={cn(
                           'inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium transition-opacity hover:opacity-75',
                           product.isActive
@@ -149,7 +149,7 @@ export default function BackofficeProductsPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
-                        <Link href={ROUTES.BACKOFFICE.PRODUCT_EDIT(product.id)}>
+                        <Link href={ROUTES.BACKOFFICE.PRODUCT_EDIT(product.slug)}>
                           <Button variant="ghost" size="icon" aria-label="Editar">
                             <Pencil className="h-4 w-4" />
                           </Button>
@@ -157,7 +157,7 @@ export default function BackofficeProductsPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => handleDelete(product.id, product.name)}
+                          onClick={() => handleDelete(product.slug, product.name)}
                           aria-label="Eliminar"
                           className="text-red-500 hover:bg-red-50 hover:text-red-600"
                         >

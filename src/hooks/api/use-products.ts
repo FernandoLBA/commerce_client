@@ -45,19 +45,19 @@ export function useProductsPaginated(
 }
 
 /**
- * Hook to fetch a single product by ID
+ * Hook to fetch a single product by Slug
  */
 export function useProduct(
-  id: string,
+  slug: string,
   options?: Omit<
     UseQueryOptions<ProductWithDetails, AxiosError<ApiError>>,
     'queryKey' | 'queryFn'
   >
 ) {
   return useQuery({
-    queryKey: QUERY_KEYS.PRODUCT(id),
-    queryFn: () => productsApi.getById(id),
-    enabled: Boolean(id),
+    queryKey: QUERY_KEYS.PRODUCT(slug),
+    queryFn: () => productsApi.getByIdOrSlug(slug),
+    enabled: Boolean(slug),
     ...options,
   });
 }
@@ -74,7 +74,7 @@ export function useProductById(
 ) {
   return useQuery({
     queryKey: QUERY_KEYS.PRODUCT(id),
-    queryFn: () => productsApi.getById(id),
+    queryFn: () => productsApi.getByIdOrSlug(id),
     enabled: Boolean(id),
     ...options,
   });

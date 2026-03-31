@@ -1,5 +1,6 @@
-import * as yup from 'yup';
 import { VALIDATION } from '@/constants';
+import { REGEX } from '@/regex';
+import * as yup from 'yup';
 
 /**
  * Common validation messages
@@ -78,6 +79,7 @@ export const registerSchema = yup.object({
   password: yup
     .string()
     .required(VALIDATION_MESSAGES.REQUIRED)
+    .matches(REGEX.PASSWORD, 'La contraseña debe contener al menos una letra mayúscula, una letra minúscula, un número y un carácter especial')
     .min(VALIDATION.PASSWORD_MIN_LENGTH, VALIDATION_MESSAGES.PASSWORD_MIN)
     .max(VALIDATION.PASSWORD_MAX_LENGTH, VALIDATION_MESSAGES.PASSWORD_MAX),
   confirmPassword: yup

@@ -96,3 +96,12 @@ export function ProductGridSkeleton({ count = 8 }: { count?: number }) {
     </div>
   );
 }
+
+/**
+ * Upload button skeleton
+ */
+export function UploadButtonSkeleton() {
+  return (
+    <Skeleton className="space-y-2 h-28" />
+  )
+}

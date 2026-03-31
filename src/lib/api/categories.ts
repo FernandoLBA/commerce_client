@@ -21,7 +21,7 @@ export const categoriesApi = {
    */
   getById: async (id: string): Promise<Category> => {
     const response = await apiClient.get<ApiResponse<Category>>(
-      API_ENDPOINTS.CATEGORIES.BY_ID(id)
+      API_ENDPOINTS.CATEGORIES.BY_SEARCH(id)
     );
     return response.data.data;
   },

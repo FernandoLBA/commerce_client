@@ -1,24 +1,25 @@
 'use client';
 
+import { yupResolver } from '@hookform/resolvers/yup';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+
 import { Button, Input } from '@/components/ui';
 import { ROUTES } from '@/constants';
 import { useRegister } from '@/hooks';
 import { getErrorMessage } from '@/lib/api';
 import { registerSchema, type RegisterFormData } from '@/lib/validations';
 import { toast } from '@/store';
-import { yupResolver } from '@hookform/resolvers/yup';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
 
 export default function RegisterPage() {
   const router = useRouter();
   const registerMutation = useRegister();
-
+  
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting},
   } = useForm({
     resolver: yupResolver(registerSchema),
   });

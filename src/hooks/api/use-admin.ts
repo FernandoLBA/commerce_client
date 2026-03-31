@@ -1,34 +1,34 @@
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  type UseQueryOptions,
-  type UseMutationOptions,
-} from '@tanstack/react-query';
-import { AxiosError } from 'axios';
 import { QUERY_KEYS } from '@/constants';
 import { adminApi } from '@/lib/api';
 import type {
+  AdminOrderFilters,
+  AdminProductFilters,
+  AdminReviewFilters,
+  AdminStats,
+  AdminUpdateUserData,
+  AdminUserFilters,
+  ApiError,
+  Category,
+  CreateCategoryData,
+  CreateProductData,
+  Order,
+  PaginatedResponse,
   Product,
   ProductWithDetails,
-  Category,
-  Order,
   Review,
-  User,
-  PaginatedResponse,
-  ApiError,
-  AdminStats,
-  CreateProductData,
-  UpdateProductData,
-  CreateCategoryData,
   UpdateCategoryData,
   UpdateOrderData,
-  AdminUpdateUserData,
-  AdminProductFilters,
-  AdminOrderFilters,
-  AdminUserFilters,
-  AdminReviewFilters,
+  UpdateProductData,
+  User,
 } from '@/types';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type UseMutationOptions,
+  type UseQueryOptions,
+} from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 
 // ── Stats ────────────────────────────────────────────────────────────────────
 
@@ -78,16 +78,16 @@ export function useUpdateProduct(
   options?: UseMutationOptions<
     ProductWithDetails,
     AxiosError<ApiError>,
-    { id: string; data: UpdateProductData }
+    { slug: string; data: UpdateProductData }
   >
 ) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }) => adminApi.updateProduct(id, data),
-    onSuccess: (_, { id }) => {
+    mutationFn: ({ slug, data }) => adminApi.updateProduct(slug, data),
+    onSuccess: (_, { slug }) => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_PRODUCT(id) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_PRODUCT(slug) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PRODUCTS });
     },
     ...options,
@@ -100,7 +100,7 @@ export function useDeleteProduct(
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => adminApi.deleteProduct(id),
+    mutationFn: (slug: string) => adminApi.deleteProduct(slug),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PRODUCTS });

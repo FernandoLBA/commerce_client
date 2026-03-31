@@ -10,8 +10,8 @@ export interface Category extends BaseEntity {
   image: string | null;
   parentId: string | null;
   isActive: boolean;
-  displayOrder: number;
   parent?: Category;
+  displayOrder?: number;
   children?: Category[];
 }
 

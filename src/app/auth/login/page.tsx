@@ -1,14 +1,15 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+
 import { Button, Input } from '@/components/ui';
-import { loginSchema, type LoginFormData } from '@/lib/validations';
+import { ROUTES } from '@/constants';
 import { useLogin } from '@/hooks';
 import { getErrorMessage } from '@/lib/api';
-import { ROUTES } from '@/constants';
+import { loginSchema, type LoginFormData } from '@/lib/validations';
 import { toast } from '@/store';
 
 export default function LoginPage() {
@@ -38,6 +39,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900">Iniciar sesión</h1>
+          
           <p className="mt-2 text-gray-600">
             Ingresa tus credenciales para acceder a tu cuenta
           </p>
@@ -68,8 +70,10 @@ export default function LoginPage() {
                 type="checkbox"
                 className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
               />
+
               <span className="text-sm text-gray-600">Recordarme</span>
             </label>
+
             <Link
               href={ROUTES.AUTH.FORGOT_PASSWORD}
               className="text-sm font-medium text-primary-600 hover:text-primary-500"

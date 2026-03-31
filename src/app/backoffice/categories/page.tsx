@@ -1,32 +1,37 @@
 'use client';
 
+import { ImageIcon, Pencil, Plus, Trash2 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+
 import { Button, Loading } from '@/components/ui';
-import { useCategories, useDeleteCategory, useUpdateCategory } from '@/hooks';
+import { ROUTES } from '@/constants';
+import { useDeleteCategory, useUpdateCategory } from '@/features';
+import { useCategories } from '@/hooks';
 import { getErrorMessage } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { toast } from '@/store';
-import { ROUTES } from '@/constants';
+import { Category } from '@/types';
+
 
 export default function BackofficeCategoriesPage() {
   const { data: categories, isLoading } = useCategories();
   const deleteCategory = useDeleteCategory();
   const updateCategory = useUpdateCategory();
 
-  const handleDelete = async (id: string, name: string) => {
+  const handleDelete = async (slug: string, name: string) => {
     if (!confirm(`¿Eliminar la categoría "${name}"? Los productos asociados quedarán sin categoría.`)) return;
     try {
-      await deleteCategory.mutateAsync(id);
+      await deleteCategory.mutateAsync(slug);
       toast.success('Eliminada', `"${name}" fue eliminada`);
     } catch (error) {
       toast.error('Error', getErrorMessage(error));
     }
   };
 
-  const handleToggleActive = async (id: string, currentState: boolean) => {
+  const handleToggleActive = async (slug: string, currentState: boolean) => {
     try {
-      await updateCategory.mutateAsync({ id, data: { isActive: !currentState } });
+      await updateCategory.mutateAsync({ slug, data: { isActive: !currentState } });
       toast.success('Actualizada', `Categoría ${!currentState ? 'activada' : 'desactivada'}`);
     } catch (error) {
       toast.error('Error', getErrorMessage(error));
@@ -57,6 +62,7 @@ export default function BackofficeCategoriesPage() {
             <table className="w-full text-sm">
               <thead className="border-b border-gray-200 bg-gray-50">
                 <tr className="text-left">
+                  <th className="px-4 py-3 font-medium text-gray-500">Imagen</th>
                   <th className="px-4 py-3 font-medium text-gray-500">Nombre</th>
                   <th className="px-4 py-3 font-medium text-gray-500 hidden sm:table-cell">Categoría padre</th>
                   <th className="px-4 py-3 font-medium text-gray-500 text-center hidden md:table-cell">Orden</th>
@@ -65,11 +71,32 @@ export default function BackofficeCategoriesPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {categories.map((category) => (
+                {categories.map((category: Category) => (
                   <tr key={category.id} className="hover:bg-gray-50">
+                    <td className='px-4 py-3'>
+                      <Link
+                      href={ROUTES.BACKOFFICE.CATEGORY_EDIT(category.slug)}
+                      className="hover:text-primary-600 hover:underline"
+                      >
+                          {category?.image ? (
+                            <Image 
+                              src={category.image}
+                              alt='Category'
+                              width={60}
+                              height={60}
+                              className='rounded-md object-cover h-15 w-15'
+                            />
+                            ):(
+                                <div className='flex items-center justify-center border-2 border-gray-400 text-gray-400 bg-gray-100 px-4 py-3 rounded-md h-15 w-15'>
+                                <ImageIcon size={30} />
+                              </div>
+                            )
+                          }
+                      </Link>
+                    </td>
                     <td className="px-4 py-3 font-medium text-gray-900">
                       <Link
-                        href={ROUTES.BACKOFFICE.CATEGORY_EDIT(category.id)}
+                        href={ROUTES.BACKOFFICE.CATEGORY_EDIT(category.slug)}
                         className="hover:text-primary-600 hover:underline"
                       >
                         {category.name}
@@ -99,7 +126,7 @@ export default function BackofficeCategoriesPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
-                        <Link href={ROUTES.BACKOFFICE.CATEGORY_EDIT(category.id)}>
+                        <Link href={ROUTES.BACKOFFICE.CATEGORY_EDIT(category.slug)}>
                           <Button variant="ghost" size="icon" aria-label="Editar">
                             <Pencil className="h-4 w-4" />
                           </Button>
