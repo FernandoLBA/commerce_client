@@ -123,7 +123,7 @@ export default function ProductsPage() {
                 return (
                   <Link
                     key={product.id}
-                    href={ROUTES.SHOP.PRODUCT_DETAIL(product.id)}
+                    href={ROUTES.SHOP.PRODUCT_DETAIL(product.slug)}
                     className={cn(
                       'group overflow-hidden rounded-lg border border-gray-200 bg-white transition-shadow hover:shadow-md',
                       viewMode === 'list' ? 'flex' : ''

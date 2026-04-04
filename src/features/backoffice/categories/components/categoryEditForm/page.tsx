@@ -6,17 +6,15 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useForm, type Resolver } from 'react-hook-form';
 
-import { Button, IconButton, IconLinkButton, Input, Loading } from '@/components/ui';
+import { Button, EmptyData, IconButton, IconLinkButton, Input, Loading } from '@/components/ui';
 import { UploadButton } from '@/components/ui/upload-button';
-import { FILE_SIZES, ROUTES } from '@/constants';
+import { allowedFileTypes, FILE_SIZES, ROUTES } from '@/constants';
 import { useCategories, useDisclosure } from '@/hooks';
 import { getErrorMessage } from '@/lib/api';
 import { toast } from '@/store';
-
 import { useUpdateCategory, useUploadCategoryImage } from '../../hooks';
-import { EmptyCategory } from './components';
-import { categorySchema } from './schemas/category.schema';
-import { CategoryFormData } from './types/category-form-data.interface';
+import { categorySchema } from '../../schemas';
+import { CategoryFormData } from '../../types';
 
 export function CategoryEditForm({ categorySlug }: { categorySlug: string }) {
   const [imageError, setImageError] = useState<string | null>(null);
@@ -36,7 +34,9 @@ export function CategoryEditForm({ categorySlug }: { categorySlug: string }) {
   } = useForm<CategoryFormData>({
     resolver: yupResolver(categorySchema) as unknown as Resolver<CategoryFormData>,
   });
+  
   const handleUpload = async(files: File[]) => {
+    // TODO: Mejor que suba la imagen al darle click a un botón de subir
     try {
       if (!files.length) return;
       
@@ -83,7 +83,7 @@ export function CategoryEditForm({ categorySlug }: { categorySlug: string }) {
 
   if (!currentCategory) {
     return (
-      <EmptyCategory />
+      <EmptyData href={ROUTES.BACKOFFICE.CATEGORIES}  />
     );
   }
 
@@ -116,7 +116,7 @@ export function CategoryEditForm({ categorySlug }: { categorySlug: string }) {
             <div>
               <UploadButton 
                 onUpload={ handleUpload }
-                accept='image/jpeg, image/png'
+                accept={ allowedFileTypes.IMAGE }
                 multiple={ false }
                 maxSize={ FILE_SIZES.IMAGE }
                 maxFiles={ 1 }
@@ -131,7 +131,6 @@ export function CategoryEditForm({ categorySlug }: { categorySlug: string }) {
               {imageError && <p className="mt-1 text-sm text-red-600">{imageError}</p>}
             </div>
           }
-
         </div>
 
         <Input
@@ -140,7 +139,7 @@ export function CategoryEditForm({ categorySlug }: { categorySlug: string }) {
           {...register('name')}
         />
         <Input
-        label='Slug'
+        label='Slug (URL amigable'
           className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
           {...register('slug')}
         />

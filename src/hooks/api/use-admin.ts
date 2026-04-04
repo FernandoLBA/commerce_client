@@ -129,16 +129,16 @@ export function useUpdateCategory(
   options?: UseMutationOptions<
     Category,
     AxiosError<ApiError>,
-    { id: string; data: UpdateCategoryData }
+    { slug: string; data: UpdateCategoryData }
   >
 ) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }) => adminApi.updateCategory(id, data),
-    onSuccess: (_, { id }) => {
+    mutationFn: ({ slug, data }) => adminApi.updateCategory(slug, data),
+    onSuccess: (_, { slug }) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CATEGORIES });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CATEGORY(id) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CATEGORY(slug) });
     },
     ...options,
   });

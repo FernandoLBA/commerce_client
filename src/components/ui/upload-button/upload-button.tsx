@@ -1,15 +1,15 @@
 'use client';
 
-import { AlertCircle, CheckCircle, Upload, X } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 
 import { cn, formatFileSize } from '@/lib/utils';
 import { Button } from '../button';
-import { Loading } from '../loading';
+import { UploadedFilesList } from './components';
 import { useFileValidation } from './hooks';
 import { UploadedFile } from './interfaces/uploaded-file.interface';
 
-interface UploadButtonProps {
+export interface UploadButtonProps {
   onUpload: (files: File[]) => Promise<void> | void;
   accept?: string;
   multiple?: boolean;
@@ -23,6 +23,9 @@ interface UploadButtonProps {
   className?: string;
   onError?: (error: string) => void;
   showPreview?: boolean;
+  isSubmit?: boolean;
+  onSubmit?: () => void;
+  isSubmitting?: boolean;
 }
 
 export function UploadButton({
@@ -39,10 +42,14 @@ export function UploadButton({
   onError,
   showPreview = true,
   loading = false,
+  isSubmit = false,
+  isSubmitting = false,
+  onSubmit,
 }: UploadButtonProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState<string>("")
 
   const { validate } = useFileValidation({ maxFiles, maxSize, accept });
 
@@ -61,7 +68,9 @@ export function UploadButton({
       const { validFiles, errors } = validate(files);
 
       if (errors.length > 0) {
-        onError?.(errors.join(', '));
+        const joinedErrors = errors.join(', ');
+        onError?.(joinedErrors);
+        setError(joinedErrors)
         return;
       }
 
@@ -85,11 +94,14 @@ export function UploadButton({
             validFiles.includes(uf.file) ? { ...uf, status: 'success' } : uf
           )
         );
+
+        setError("")
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : 'Error al subir archivos';
 
         onError?.(errorMessage);
+        setError(errorMessage)
 
         // Marcar como error
         setUploadedFiles((prev) =>
@@ -113,6 +125,12 @@ export function UploadButton({
   const handleClick = () => {
     inputRef.current?.click();
   };
+
+  const handleSubmit = () => {
+    if(isSubmit && onSubmit) {
+      onSubmit()
+    }
+  }
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -179,9 +197,9 @@ export function UploadButton({
       />
 
       {/* Botón o área de drag-drop */}
-      {uploadedFiles.length === 0 || multiple ? (
+      {uploadedFiles.length <= 0 ? (
         <div
-          className="rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-blue-400 hover:bg-blue-50"
+          className="rounded-lg borøder-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-blue-400 hover:bg-blue-50"
           onDragOver={handleDragOver}
           onDrop={handleDrop}
         >
@@ -189,7 +207,7 @@ export function UploadButton({
             type="button"
             onClick={handleClick}
             disabled={disabled || isUploading}
-            className={buttonStyles}
+            // className={buttonStyles}
             variant={variant}
           >
             <Upload className="h-5 w-5" />
@@ -228,72 +246,45 @@ export function UploadButton({
           
           <div className="space-y-2">
             {uploadedFiles.map((uploadedFile, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3"
-              >
-                {/* Preview de imagen */}
-                {uploadedFile.preview && (
-                  <img
-                    src={uploadedFile.preview}
-                    alt={uploadedFile.file.name}
-                    className="h-10 w-10 rounded object-cover"
-                  />
-                )}
-
-                {/* Info del archivo */}
-                <div className="flex-1 min-w-0">
-                  <p className="truncate text-sm font-medium text-gray-900">
-                    {uploadedFile.file.name}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {formatFileSize(uploadedFile.file.size)}
-                  </p>
-                  {uploadedFile.error && (
-                    <p className="text-xs text-red-600">{uploadedFile.error}</p>
-                  )}
-                </div>
-
-                {/* Estado */}
-                <div className="flex items-center gap-2">
-                  {loading && (
-                    <Loading message='' />
-                    // <div className="h-5 w-5 animate-spin rounded-full border-2 border-blue-200 border-t-blue-600" />
-                  )}
-                  {uploadedFile.status === 'success' && (
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                  )}
-                  {uploadedFile.status === 'error' && (
-                    <AlertCircle className="h-5 w-5 text-red-600" />
-                  )}
-
-                  {/* Botón eliminar */}
-                  <Button
-                    type="button"
-                    onClick={() => removeFile(index)}
-                    variant='outline'
-                    disabled={loading}
-                  >
-                    <X className="h-5 w-5" />
-                  </Button>
-                </div>
-              </div>
+              <UploadedFilesList 
+                key={index} 
+                index={index} 
+                loading={loading} 
+                removeFile={removeFile} 
+                uploadedFile={uploadedFile} 
+              />
             ))}
           </div>
+
+          {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
           
           {/* Botón para agregar más archivos */}
-          {multiple && (
-            <Button
-              type="button"
-              onClick={handleClick}
-              disabled={disabled || isUploading}
-              variant={variant}
-              // className={cn(buttonStyles, 'w-full')}
-            >
-              <Upload className="h-5 w-5" />
-              Agregar más
-            </Button>
-          )}
+          <div className='flex justify-end gap-4'>
+            {multiple && (
+              <Button
+                type="button"
+                onClick={handleClick}
+                variant={isSubmit ? "outline" : variant}
+                className='w-fit'
+                disabled={disabled || isUploading}
+              >
+                Agregar más
+              </Button>
+            )}
+
+            {isSubmit && 
+              <Button
+                type="button"
+                onClick={handleSubmit}
+                disabled={disabled || error.length > 0 || isUploading || isSubmitting}
+                variant={variant}
+                className={`w-fit`}
+                isLoading={isSubmitting}
+                >
+                Guardar
+              </Button>
+            }
+          </div>
         </div>
       )}
     </div>

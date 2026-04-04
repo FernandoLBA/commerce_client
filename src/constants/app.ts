@@ -145,4 +145,5 @@ export const VALIDATION = {
 
 export const FILE_SIZES = {
   IMAGE: 1 * 1024 * 1024,
+  FILE: 10 * 1024 * 1024,
 } as const;
