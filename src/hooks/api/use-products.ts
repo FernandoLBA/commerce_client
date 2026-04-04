@@ -56,7 +56,7 @@ export function useProduct(
 ) {
   return useQuery({
     queryKey: QUERY_KEYS.PRODUCT(slug),
-    queryFn: () => productsApi.getBySlug(slug),
+    queryFn: () => productsApi.getByIdOrSlug(slug),
     enabled: Boolean(slug),
     ...options,
   });

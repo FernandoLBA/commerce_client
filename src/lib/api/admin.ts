@@ -13,12 +13,13 @@ import type {
   Order,
   PaginatedResponse,
   Product,
+  ProductImage,
   ProductWithDetails,
   Review,
   UpdateCategoryData,
   UpdateOrderData,
   UpdateProductData,
-  User,
+  User
 } from '@/types';
 import { apiClient } from './client';
 
@@ -100,6 +101,24 @@ export const adminApi = {
    */
   deleteProduct: async (slug: string): Promise<void> => {
     await apiClient.delete(API_ENDPOINTS.PRODUCTS.BY_SEARCH(slug));
+  },
+
+  uploadProductImages: async (productId: string, files: File[]): Promise<ProductImage> => {
+    const formData = new FormData();
+    
+    files.forEach(async(image) => {
+      formData.append('files', image);
+    })  
+      
+    const response = await apiClient.post(
+      API_ENDPOINTS.PRODUCTS.UPLOAD_IMAGES(productId),
+      formData,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      },
+    )
+
+    return response.data.data;
   },
 
   // ── Categories ───────────────────────────────────────────────────────────

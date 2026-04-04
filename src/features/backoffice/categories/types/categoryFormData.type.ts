@@ -5,5 +5,5 @@ export interface CategoryFormData {
   parentId?: string;
   displayOrder?: number;
   isActive: boolean;
-  image?: string | null;
+  image?: string;
 }

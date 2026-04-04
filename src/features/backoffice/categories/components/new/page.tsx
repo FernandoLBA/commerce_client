@@ -1,37 +1,18 @@
-'use client';
-
-import { Button, Input, Spinner } from '@/components/ui';
-import { ROUTES } from '@/constants';
-import { useCategories } from '@/hooks';
-import { getErrorMessage } from '@/lib/api';
-import { toast } from '@/store';
-import { yupResolver } from '@hookform/resolvers/yup';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm, type Resolver } from 'react-hook-form';
-import * as yup from 'yup';
 
-import { useCreateCategory } from '../../hooks';
+import { Button, IconLinkButton, Input, Spinner } from '@/components/ui';
+import { ROUTES } from '@/constants';
+import { useCategories, useCreateCategory } from '@/hooks';
+import { getErrorMessage } from '@/lib/api';
+import { toast } from '@/store';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { ArrowLeft } from 'lucide-react';
+import { categorySchema } from '../../schemas';
+import { CategoryFormData } from '../../types';
 
-const categorySchema = yup.object({
-  name: yup.string().required('El nombre es requerido').min(2, 'Mínimo 2 caracteres'),
-  slug: yup.string().optional(),
-  description: yup.string().optional(),
-  parentId: yup.string().optional(),
-  displayOrder: yup.number().optional().min(0).integer().typeError('Ingresa un número válido'),
-  isActive: yup.boolean().default(true),
-});
-
-interface CategoryFormData {
-  name: string;
-  slug?: string;
-  description?: string;
-  parentId?: string;
-  displayOrder?: number;
-  isActive: boolean;
-}
-
-export default function BackofficeCategoryNewPage() {
+export default function CategoryNewPage() {
   const router = useRouter();
   const createCategory = useCreateCategory();
   const { data: categories, isLoading: categoriesLoading } = useCategories();
@@ -61,9 +42,9 @@ export default function BackofficeCategoryNewPage() {
   return (
     <div className="mx-auto max-w-xl space-y-6">
       <div className="flex items-center gap-4">
-        <Link href={ROUTES.BACKOFFICE.CATEGORIES} className="text-sm text-gray-500 hover:text-gray-700">
-          ← Categorías
-        </Link>
+        <IconLinkButton href={ROUTES.BACKOFFICE.CATEGORIES} variant='primary'>
+          <ArrowLeft size={18} />
+        </IconLinkButton>
         <h1 className="text-2xl font-bold text-gray-900">Nueva categoría</h1>
       </div>
 

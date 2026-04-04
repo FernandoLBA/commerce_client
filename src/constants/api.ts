@@ -26,6 +26,7 @@ export const API_ENDPOINTS = {
   PRODUCTS: {
     BASE: '/products',
     BY_SEARCH: (search: string) => `/products/${search}`,
+    UPLOAD_IMAGES: (productId: string) => `/products/${productId}/files/upload`
   },
 
   // Categories
