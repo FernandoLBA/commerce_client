@@ -1,4 +1,4 @@
-export { UploadButton } from './upload-button/upload-button';
+export { AppImage, type AppImageProps } from './app-image';
 export { Badge, DiscountBadge, StockBadge } from './badge';
 export { Button, type ButtonProps } from './button';
 export { EmptyData, type EmptyDataProps } from './empty-data';
@@ -9,3 +9,4 @@ export { Loading, ProductCardSkeleton, ProductGridSkeleton, Skeleton, Spinner, U
 export { Modal, type ModalProps } from './modal';
 export { Rating, RatingInput } from './rating';
 export { ToastContainer } from './toast';
+export { UploadButton } from './upload-button/upload-button';

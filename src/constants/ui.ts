@@ -31,9 +31,10 @@ export const ROUTES = {
   // Shop routes
   SHOP: {
     PRODUCTS: '/products',
+    SEARCH: '/search',
+    BACKOFFICE: '/backoffice',
     PRODUCT_DETAIL: (slug: string) => `/products/${slug}`,
     CATEGORY: (slug: string) => `/categories/${slug}`,
-    SEARCH: '/search',
   },
 
   // User routes

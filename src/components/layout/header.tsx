@@ -1,10 +1,5 @@
 'use client';
 
-import { Button } from '@/components/ui';
-import { APP_CONFIG, ROUTES } from '@/constants';
-import { useCart } from '@/hooks';
-import { cn } from '@/lib/utils';
-import { useAuthStore, useUIStore } from '@/store';
 import {
   Heart,
   LogOut,
@@ -20,12 +15,22 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+
+import { Button } from '@/components/ui';
+import { APP_CONFIG, ROUTES } from '@/constants';
+import { useCart } from '@/hooks';
+import { cn } from '@/lib/utils';
+import { useAuthStore, useUIStore } from '@/store';
 import { logo } from '../../../public/images';
 
 const NAV_LINKS = [
   { href: ROUTES.HOME, label: 'Inicio' },
   { href: ROUTES.SHOP.PRODUCTS, label: 'Productos' },
 ];
+
+const ADMIN_NAV_LINKS = [
+  { href: ROUTES.SHOP.BACKOFFICE, label: 'Backoffice' },
+]
 
 const ACCOUNT_LINKS = [
   { name: 'Mi Perfil', href: ROUTES.USER.PROFILE, icon: User },
@@ -43,8 +48,12 @@ export function Header() {
   const router = useRouter();
   const { isAuthenticated, clearAuth } = useAuthStore();
   const { data: cart } = useCart();
-  const cartItemCount = cart?.itemCount ?? 0;
   const { isMobileMenuOpen, toggleMobileMenu, openSearch } = useUIStore();
+  const cartItemCount = cart?.itemCount ?? 0;
+  
+  const handleNavLinks = () => {
+    return isAuthenticated ? [...NAV_LINKS, ...ADMIN_NAV_LINKS] : NAV_LINKS;
+  }
 
   const handleLogout = () => {
     clearAuth();
@@ -66,7 +75,7 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex md:items-center md:gap-8">
-            {NAV_LINKS.map((link) => (
+            {handleNavLinks().map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -160,7 +169,7 @@ export function Header() {
                   Navegación
                 </span>
               </div>
-              {NAV_LINKS.map((link) => (
+              {handleNavLinks().map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}

@@ -12,6 +12,7 @@ import { ROUTES } from '@/constants/ui';
 import { useCategories, useProducts } from '@/hooks/api';
 import { calculateDiscountPercentage, formatCurrency } from '@/lib/utils';
 import type { Category, Product } from '@/types';
+import { AppImage } from '@/components';
 
 const HERO_CONTENT = {
   title: 'Descubre productos increíbles',
@@ -149,10 +150,11 @@ export default function HomePage() {
                 >
                   <div className="relative aspect-square overflow-hidden rounded-xl bg-white shadow-sm transition-all hover:shadow-md">
                     {category.image ? (
-                      <Image
+                      <AppImage
                         src={category.image}
                         alt={category.name}
-                        fill
+                        loading='eager'
+                        sizes=''
                         className="object-cover transition-transform group-hover:scale-105"
                       />
                     ) : (
@@ -228,6 +230,7 @@ export default function HomePage() {
                           <Image
                             src={product.images[0].url}
                             alt={product.images[0].alt ?? product.name}
+                            loading='eager'
                             fill
                             className="object-cover transition-transform group-hover:scale-105"
                           />

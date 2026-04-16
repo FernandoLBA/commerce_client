@@ -12,32 +12,33 @@ export const useUploadFiles = (type: AllowedFilesType) => {
     setErrors((prev) => [...prev, ...errors])
   }, [])
 
-  const cleanFiles = useCallback(() => setFiles([]), []);
+  const cleanFiles = useCallback(() => setFiles([]), [setFiles]);
 
   const handleUploadFiles = useCallback((files: File[]) => {
     const allowedFiles: File[] = [];
 
     cleanErrors();
-    cleanFiles();
 
     files.forEach((file) => {
       if(!file.type.includes(type.toLowerCase())) {
-        handleErrors([`The file "${file.name}" has a not allowed type "${file.type}"`])
+        handleErrors([`El archivo "${file.name}" tiene un tipo no permitido "${file.type}"`])
         return;
       }
       
       const itExists = allowedFiles.some((allowedFile) => allowedFile.name === file.name)
       
       if(itExists) {
-        handleErrors([`The file "${file.name}" already exists`])
+        handleErrors([`El archivo "${file.name}" ya fue seleccionado`])
         return;
       }
 
       allowedFiles.push(file);
     })
 
-    setFiles((prev) => [...prev, ...allowedFiles])
-  }, [type, cleanErrors, handleErrors, cleanFiles]);
+    setFiles((prev) => {
+      return [...prev, ...allowedFiles];
+    })
+  }, [type, setFiles, cleanErrors, handleErrors, ]);
 
 
   return {

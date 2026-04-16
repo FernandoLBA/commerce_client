@@ -103,6 +103,9 @@ export const adminApi = {
     await apiClient.delete(API_ENDPOINTS.PRODUCTS.BY_SEARCH(slug));
   },
 
+  /**
+   * Upload Product's images
+   */
   uploadProductImages: async (productId: string, files: File[]): Promise<ProductImage> => {
     const formData = new FormData();
     
@@ -118,6 +121,15 @@ export const adminApi = {
       },
     )
 
+    return response.data.data;
+  },
+
+  /**
+   * Delete a product image by ID
+   */
+  deleteProductImage: async (imageId: string): Promise<string> => {
+    const response = await apiClient.delete(API_ENDPOINTS.PRODUCTS.DELETE_IMAGE(imageId));
+    
     return response.data.data;
   },
 

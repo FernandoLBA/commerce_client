@@ -1,135 +1,113 @@
 'use client';
 
 import { Upload } from 'lucide-react';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 
-import { cn, formatFileSize } from '@/lib/utils';
+import { FILE_SIZES } from '@/constants';
+import { useUpload } from '@/hooks';
+import { formatFileSize } from '@/lib/utils';
 import { Button } from '../button';
 import { UploadedFilesList } from './components';
-import { useFileValidation } from './hooks';
-import { UploadedFile } from './interfaces/uploaded-file.interface';
+import { useParseFiles } from './hooks';
 
 export interface UploadButtonProps {
-  onUpload: (files: File[]) => Promise<void> | void;
-  accept?: string;
-  multiple?: boolean;
-  maxSize?: number; // bytes
-  maxFiles?: number;
-  disabled?: boolean;
-  loading?: boolean;
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
-  size?: 'sm' | 'md' | 'lg';
-  children?: React.ReactNode;
-  className?: string;
-  onError?: (error: string) => void;
-  showPreview?: boolean;
-  isSubmit?: boolean;
-  onSubmit?: () => void;
-  isSubmitting?: boolean;
+  error?:  string; // Mensaje de error a mostrar (ej. "Archivo demasiado grande" o "Tipo de archivo no permitido")
+  files: File[]; // Archivos actualmente seleccionados (pendientes de subir)
+  accept?: string; // Tipos de archivos permitidos (ej. "image/*", "application/pdf", ".doc,.docx", etc.)
+  multiple?: boolean; // Permitir selección de múltiples archivos
+  maxSize?: number; // Tamaño máximo permitido por archivo en bytes
+  maxFiles?: number; // Cantidad máxima de archivos permitidos
+  disabled?: boolean; // Deshabilitar el botón o área de drag-drop
+  loading?: boolean; // Indicar que se está procesando la subida de archivos (puede mostrar un spinner o deshabilitar acciones)
+  children?: React.ReactNode; // Contenido personalizado para el botón (ej. "Subir imagen" o "Agregar archivos")
+  filesUploaded?: number; // Para casos de edición, cantidad de archivos ya asociados al recurso
+  onUpload: (files: File[], accept: string, maxSize: number, maxFiles: number) => void; // Función para manejar la subida de archivos, recibe los archivos seleccionados y las restricciones
+  onCancel: () => void; // Función para manejar la acción de cancelar la subida de archivos
+  onDeleteFile: (index: number) => void; // Función para manejar la eliminación de un archivo específico, recibe el índice del archivo a eliminar
+  onClearFiles: () => void; // Función para manejar la eliminación de todos los archivos seleccionados
+  onSubmit: () => Promise<void> | void; // Función para manejar la acción de guardar o enviar los archivos, puede ser asíncrona si requiere esperar a que se complete la subida
 }
 
 export function UploadButton({
-  onUpload,
+  onUpload, 
+  onDeleteFile, 
+  onClearFiles, 
+  error,
+  files, 
+  loading = false,
   accept = '*',
   multiple = false,
-  maxSize = 5 * 1024 * 1024, // 10MB default
+  maxSize = FILE_SIZES.IMAGE,
   maxFiles = 1,
   disabled = false,
-  variant = 'primary',
-  size = 'md',
   children,
-  className,
-  onError,
-  showPreview = true,
-  loading = false,
-  isSubmit = false,
-  isSubmitting = false,
   onSubmit,
+  filesUploaded = 0,
+  onCancel,
 }: UploadButtonProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
-  const [error, setError] = useState<string>("")
+  const { parsedFiles, handleParseFiles, handleDeleteParsedFile, clearParsedFiles } = useParseFiles();
 
-  const { validate } = useFileValidation({ maxFiles, maxSize, accept });
+  const uploadedFilesMemo = useMemo(() => filesUploaded, [filesUploaded]);
 
-  const generatePreview = useCallback((file: File): string | undefined => {
-    if (!showPreview || !file.type.startsWith('image/')) {
-      return undefined;
-    }
+  const { allowedExtensions, filesCount, isMaxExceeded, remainingFiles } = useUpload({ accept, maxSize, maxFiles, dbFilesCount: uploadedFilesMemo });
+  
+  console.log("🚀 ~ UploadButton:", {filesCount, isMaxExceeded, remainingFiles, uploadedFilesMemo})
 
-    return URL.createObjectURL(file);
-  }, [showPreview]);
+  const handleDeleteFiles = useCallback(() => {
+    clearParsedFiles();
+    onClearFiles();
+  }, [clearParsedFiles, onClearFiles]);
+
+  const handleDeleteFile = useCallback((index: number) => {
+    onDeleteFile(index);
+    handleDeleteParsedFile(index);
+
+  }, [onDeleteFile, handleDeleteParsedFile]);
 
   const handleFileSelect = useCallback(
-    async (files: FileList | null) => {
-      if (!files) return;
+    (newFiles: FileList | null) => {
+      if (!newFiles) return;
 
-      const { validFiles, errors } = validate(files);
+      // if (error && error?.length > 0) {
+      //   return;
+      // }
+      
+      console.log("🚀 ~ UploadButton ~ 2:", newFiles)
+      handleParseFiles(newFiles, 'pending');
+      
+      console.log("🚀 ~ UploadButton ~ parsed:", parsedFiles)
+          
+      onUpload(Array.from(newFiles), accept, maxSize, maxFiles);
 
-      if (errors.length > 0) {
-        const joinedErrors = errors.join(', ');
-        onError?.(joinedErrors);
-        setError(joinedErrors)
-        return;
-      }
+      // Marcar como exitosos
+      handleParseFiles(newFiles, 'success');
 
-      // Crear entradas para archivos seleccionados
-      const newFiles: UploadedFile[] = validFiles.map((file) => ({
-        file,
-        preview: generatePreview(file),
-        status: 'pending',
-      }));
+      // Marcar como erróneos
+      if (error  && error.length > 0) { handleParseFiles(newFiles, 'error') };
 
-      setUploadedFiles((prev) => [...prev, ...newFiles]);
-
-      // Hacer upload
-      setIsUploading(true);
-      try {
-        await onUpload(validFiles);
-
-        // Marcar como exitosos
-        setUploadedFiles((prev) =>
-          prev.map((uf) =>
-            validFiles.includes(uf.file) ? { ...uf, status: 'success' } : uf
-          )
-        );
-
-        setError("")
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : 'Error al subir archivos';
-
-        onError?.(errorMessage);
-        setError(errorMessage)
-
-        // Marcar como error
-        setUploadedFiles((prev) =>
-          prev.map((uf) =>
-            validFiles.includes(uf.file)
-              ? { ...uf, status: 'error', error: errorMessage }
-              : uf
-          )
-        );
-      } finally {
-        setIsUploading(false);
-        // Limpiar input
-        if (inputRef.current) {
-          inputRef.current.value = '';
-        }
+      // Limpiar input
+      if (inputRef.current) {
+        inputRef.current.value = '';
       }
     },
-    [validate, generatePreview, onUpload, onError]
+    [
+      accept, 
+      maxFiles, 
+      maxSize, 
+      error,
+      onUpload, 
+      parsedFiles, 
+      handleParseFiles, 
+    ]
   );
 
   const handleClick = () => {
     inputRef.current?.click();
   };
 
-  const handleSubmit = () => {
-    if(isSubmit && onSubmit) {
-      onSubmit()
-    }
+  const handleSubmit = async() => {
+      await onSubmit()
   }
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -143,49 +121,14 @@ export function UploadButton({
     handleFileSelect(e.dataTransfer.files);
   };
 
-  const removeFile = (index: number) => {
-    setUploadedFiles((prev) => {
-      const newFiles = [...prev];
-      if (newFiles[index]?.preview) {
-        URL.revokeObjectURL(newFiles[index].preview!);
-      }
-      newFiles.splice(index, 1);
-      return newFiles;
-    });
+  const handleCancel = () => {
+    clearParsedFiles();
+    onClearFiles();
+    onCancel();
   };
-
-  const clearAll = () => {
-    uploadedFiles.forEach((uf) => {
-      if (uf.preview) {
-        URL.revokeObjectURL(uf.preview);
-      }
-    });
-    setUploadedFiles([]);
-  };
-
-  // Estilos base del botón
-  const buttonStyles = cn(
-    'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors',
-    // Variantes
-    variant === 'primary' &&
-      'bg-primary-600 text-white hover:bg-primary-700 disabled:bg-primary-400',
-    variant === 'secondary' &&
-      'bg-gray-200 text-gray-900 hover:bg-gray-300 disabled:bg-gray-100',
-    variant === 'ghost' &&
-      'bg-transparent text-blue-600 hover:bg-blue-50 disabled:text-gray-400',
-    variant === 'danger' &&
-      'bg-red-600 text-white hover:bg-red-700 disabled:bg-red-400',
-    // Tamaños
-    size === 'sm' && 'px-3 py-1.5 text-sm',
-    size === 'md' && 'px-4 py-2 text-base',
-    size === 'lg' && 'px-6 py-3 text-lg',
-    // Estados
-    (disabled || isUploading || loading) && 'cursor-not-allowed opacity-50',
-    className
-  );
 
   return (
-    <div className="w-full space-y-4">
+    <div className="flex flex-col w-full space-y-4">
       {/* Input oculto */}
       <input
         ref={inputRef}
@@ -197,93 +140,128 @@ export function UploadButton({
       />
 
       {/* Botón o área de drag-drop */}
-      {uploadedFiles.length <= 0 ? (
-        <div
-          className="rounded-lg borøder-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-blue-400 hover:bg-blue-50"
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-        >
-          <Button
-            type="button"
-            onClick={handleClick}
-            disabled={disabled || isUploading}
-            // className={buttonStyles}
-            variant={variant}
-          >
-            <Upload className="h-5 w-5" />
-            {children || 'Subir archivo'}
-          </Button>
+      {(!isMaxExceeded && files.length < maxFiles) ? (
+        <div className='flex flex-col gap-4'>
+          <div
+            className={`rounded-lg border-2 border-dashed ${error ? 'border-red-500' : 'border-gray-300'} p-6 text-center transition-colors hover:border-primary-400 hover:bg-primary-50`}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            >
+            <Button
+              type="button"
+              onClick={handleClick}
+              disabled={disabled || loading}
+              size="md"
+              variant={error ? 'danger' : 'primary'}
+              >
+              <Upload className="h-5 w-5" />
+              {children || 'Subir archivo'}
+            </Button>
 
-          <p className="mt-2 text-xs text-gray-500">
-            O arrastra archivos aquí
-          </p>
-          {maxSize && (
-            <p className="text-xs text-gray-400">
-              Máximo: {formatFileSize(maxSize)}
+            <p className="my-2 text-md text-gray-500">
+              O arrastra archivos aquí
             </p>
+
+            <p className="text-xs text-gray-400">
+              Cantidad máxima: {maxFiles} {maxFiles === 1 ? 'archivo' : 'archivos'}
+            </p>
+
+            <p className="text-xs text-gray-400">
+              Tamaño máximo: {formatFileSize(maxSize)}
+            </p>
+            
+            <p className="my-1 text-sm text-gray-600">
+              Archivos restantes: { remainingFiles }
+            </p>
+
+            <p className="text-sm text-gray-600">Archivos permitidos: [{ allowedExtensions }]</p>
+
+            {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+          </div>
+
+          {multiple && (
+            <Button 
+              type='button' 
+              variant='outline' 
+              size="md" 
+              className='w-full md:w-fit md:self-end' 
+              onClick={ handleCancel }
+              disabled={ loading }
+            >
+              Cancelar
+            </Button>
           )}
         </div>
       ) : null}
 
       {/* Listado de archivos */}
-      {uploadedFiles.length > 0 && (
+      { parsedFiles.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-medium text-gray-900">
-              Archivos ({uploadedFiles.length})
+              Archivos restantes ({ remainingFiles })
             </h3>
-            {uploadedFiles.length > 0 && (
-              <button
+            {parsedFiles.length > 0 && (
+              <Button
                 type="button"
-                onClick={clearAll}
+                onClick={ handleDeleteFiles }
                 className="text-xs text-gray-500 hover:text-gray-700"
-                disabled={loading}
+                disabled={ loading }
+                variant='link'
               >
                 Limpiar todo
-              </button>
+              </Button>
             )}
           </div>
           
           <div className="space-y-2">
-            {uploadedFiles.map((uploadedFile, index) => (
+            {parsedFiles.map((parsedFile, index) => (
               <UploadedFilesList 
-                key={index} 
-                index={index} 
-                loading={loading} 
-                removeFile={removeFile} 
-                uploadedFile={uploadedFile} 
+                key={ index } 
+                index={ index } 
+                removeFile={ handleDeleteFile } 
+                uploadedFile={ parsedFile } 
               />
             ))}
           </div>
 
-          {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+          { error && <p className="mt-1 text-sm text-red-600">{error}</p> }
           
           {/* Botón para agregar más archivos */}
           <div className='flex justify-end gap-4'>
-            {multiple && (
+            <Button 
+              type='button'
+              variant='outline' 
+              size="md" 
+              className='w-full md:w-fit md:self-end' 
+              disabled={ disabled || loading } 
+              onClick={ handleCancel }
+            >
+              Cancelar
+            </Button>
+
+            { (multiple && !isMaxExceeded) && (
               <Button
                 type="button"
-                onClick={handleClick}
-                variant={isSubmit ? "outline" : variant}
-                className='w-fit'
-                disabled={disabled || isUploading}
-              >
+                onClick={ handleClick }
+                variant="secondary"
+                disabled={ disabled || loading || isMaxExceeded }
+                size="md"
+                >
                 Agregar más
               </Button>
             )}
 
-            {isSubmit && 
-              <Button
-                type="button"
-                onClick={handleSubmit}
-                disabled={disabled || error.length > 0 || isUploading || isSubmitting}
-                variant={variant}
-                className={`w-fit`}
-                isLoading={isSubmitting}
-                >
-                Guardar
-              </Button>
-            }
+            <Button
+              type="button"
+              onClick={ handleSubmit }
+              disabled={ disabled || (error && error?.length > 0) || loading || isMaxExceeded }
+              variant="primary"
+              isLoading={ loading }
+              size="md"
+              >
+              Guardar
+            </Button>
           </div>
         </div>
       )}

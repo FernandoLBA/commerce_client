@@ -2,19 +2,21 @@ import { Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
-import { Button, Input, Loading } from '@/components/ui';
+import { AppImage, Button, Input, Loading } from '@/components/ui';
+import { NoImage } from '@/components/ui/no-image';
 import { ROUTES } from '@/constants';
 import { useAdminProducts, useDeleteProduct, useUpdateProduct } from '@/hooks';
 import { getErrorMessage } from '@/lib/api';
 import { cn, formatCurrency } from '@/lib/utils';
 import { toast } from '@/store';
+import { Product } from '@/types';
 
 export default function FeatureBackofficeProductsPage() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [isActiveFilter, setIsActiveFilter] = useState<boolean | undefined>(undefined);
 
-  const { data, isLoading, isError, error } = useAdminProducts({
+  const { data: products, isLoading, isError, error } = useAdminProducts({
     search: search || undefined,
     page,
     limit: 15,
@@ -90,13 +92,14 @@ export default function FeatureBackofficeProductsPage() {
             <p className="text-sm font-medium text-red-600">Error al cargar productos</p>
             <p className="mt-1 text-xs text-gray-500">{getErrorMessage(error)}</p>
           </div>
-        ) : !data?.data?.length ? (
+        ) : !products?.data?.length ? (
           <p className="py-16 text-center text-sm text-gray-500">No se encontraron productos</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="border-b border-gray-200 bg-gray-50">
                 <tr className="text-left">
+                  <th className="px-4 py-3 font-medium text-gray-500">Imagen</th>
                   <th className="px-4 py-3 font-medium text-gray-500">Nombre</th>
                   <th className="px-4 py-3 font-medium text-gray-500 hidden md:table-cell">Categoría</th>
                   <th className="px-4 py-3 font-medium text-gray-500 text-right">Precio</th>
@@ -106,8 +109,28 @@ export default function FeatureBackofficeProductsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {data.data.map((product) => (
+                {products.data.map((product: Product) => (
                   <tr key={product.id} className="hover:bg-gray-50">
+                    <td className='px-4 py-3'>
+                      <Link
+                      href={ROUTES.BACKOFFICE.PRODUCT_EDIT(product.slug)}
+                      className="hover:text-primary-600 hover:underline"
+                      >
+                        {!!product?.images?.length ? (
+                            <AppImage 
+                              src={product.images[0]?.url || ''}
+                              alt='Product'
+                              width={60}
+                              height={60}
+                              className='rounded-md object-cover h-15 w-15'
+                            />
+                          ):(
+                            <NoImage height={60} width={60} />
+                          )
+                        }
+                      </Link>
+                    </td>
+
                     <td className="px-4 py-3 font-medium text-gray-900">
                       <Link
                         href={ROUTES.BACKOFFICE.PRODUCT_EDIT(product.slug)}
@@ -172,16 +195,16 @@ export default function FeatureBackofficeProductsPage() {
         )}
 
         {/* Pagination */}
-        {data && data?.meta?.totalPages > 1 && (
+        {products && products?.meta?.totalPages > 1 && (
           <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3">
             <p className="text-sm text-gray-500">
-              {data.meta.total} productos · página {data.meta.page} de {data.meta.totalPages}
+              {products.meta.total} productos · página {products.meta.page} de {products.meta.totalPages}
             </p>
             <div className="flex gap-2">
               <Button
                 variant="outline"
                 size="sm"
-                disabled={!data.meta.hasPrevPage}
+                disabled={!products.meta.hasPrevPage}
                 onClick={() => setPage((p) => p - 1)}
               >
                 Anterior
@@ -189,7 +212,7 @@ export default function FeatureBackofficeProductsPage() {
               <Button
                 variant="outline"
                 size="sm"
-                disabled={!data.meta.hasNextPage}
+                disabled={!products.meta.hasNextPage}
                 onClick={() => setPage((p) => p + 1)}
               >
                 Siguiente

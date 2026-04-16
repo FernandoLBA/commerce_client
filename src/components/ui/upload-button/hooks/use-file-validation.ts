@@ -1,6 +1,7 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import { formatFileSize } from '@/lib/utils';
+import { UploadedFile } from '../interfaces/uploaded-file.interface';
 
 interface ValidationOptions {
   maxFiles: number;
@@ -10,7 +11,8 @@ interface ValidationOptions {
 
 interface ValidationResult {
   validFiles: File[];
-  errors: string[];
+  validFilesCount: number;
+  errors: string;
   clearErrors: () => void;
 }
 
@@ -19,6 +21,20 @@ export const useFileValidation = ({
   maxSize,
   accept,
 }: ValidationOptions) => {
+  const [isMaxFilesReached, setIsMaxFilesReached] = useState(false);
+  const [errors, setErrors] = useState<string[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+
+  const clearErrors = useCallback(() => {
+    setUploadedFiles([]);
+  }, []);
+
+
+  const stringifyErrors = useCallback((errors: string[]) => {
+    return errors.join(', ');
+  }, []);
+
   const isValidFileType = useCallback(
     (file: File): boolean => {
       if (accept === '*') return true;
@@ -36,22 +52,32 @@ export const useFileValidation = ({
   );
 
   const validate = useCallback(
-    (files: FileList | null): ValidationResult => {
+    (files: File[] | null): ValidationResult => {
+      // const validFiles: File[] = [];
+      // let errors: string[] = [];
+
       if (!files || files.length === 0) {
-        return { validFiles: [], errors: [], clearErrors };
+        setIsMaxFilesReached(false);
+        setErrors((prev) => [...prev, 'No se seleccionaron archivos']);
+        return { validFiles: [], validFilesCount: 0, errors: stringifyErrors(errors), clearErrors };
       }
 
-      const validFiles: File[] = [];
-      let errors: string[] = [];
+      const remainingFiles = maxFiles - (files.length + uploadedFiles.length);
 
-      function clearErrors () {
-        errors = []
+      if (remainingFiles < 0) {
+        setErrors((prev) => [...prev, `Máximo ${maxFiles} archivo(s) permitido(s). Selecciona ${maxFiles} o menos.`]);
+        setIsMaxFilesReached(true);
+        return { validFiles: files, validFilesCount: files.length, errors: stringifyErrors(errors), clearErrors };
+      } else {
+        setIsMaxFilesReached(false);
+        setErrors([]);
       }
-
+      
       // Validar cantidad de archivos
-      if (files.length > maxFiles) {
-        errors.push(`Máximo ${maxFiles} archivo(s) permitido(s)`);
-        return { validFiles, errors, clearErrors };
+      if (uploadedFiles.length > maxFiles) {
+        setIsMaxFilesReached(true);
+        errors.push(`Máximo ${remainingFiles} archivo(s) permitido(s)`);
+        return { validFiles: uploadedFiles, validFilesCount: uploadedFiles.length, errors: stringifyErrors(errors), clearErrors };
       }
 
       // Validar cada archivo
@@ -70,14 +96,16 @@ export const useFileValidation = ({
         }
 
         if (isValidSize && isValidType) {
-          validFiles.push(file);
+          setUploadedFiles((prev) => [...prev, file]);
         }
       });
 
-      return { validFiles, errors, clearErrors };
+      setIsMaxFilesReached(files.length === maxFiles);
+
+      return { validFiles: uploadedFiles, validFilesCount: uploadedFiles.length, errors: stringifyErrors(errors), clearErrors };
     },
-    [maxFiles, maxSize, isValidFileType]
+    [maxFiles, maxSize, errors, setErrors, setIsMaxFilesReached, stringifyErrors, isValidFileType, clearErrors, uploadedFiles]
   );
 
-  return { validate };
+  return { validate, uploadedFiles, setUploadedFiles, isMaxFilesReached };
 };

@@ -1,10 +1,10 @@
 'use client'
 
-import { ImageIcon, Pencil, Plus, Trash2 } from "lucide-react";
-import Image from "next/image";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 
-import { Button, Loading } from "@/components";
+import { AppImage, Button, Loading } from "@/components";
+import { NoImage } from "@/components/ui/no-image";
 import { ROUTES } from "@/constants";
 import { useCategories, useDeleteCategory, useUpdateCategory } from "@/hooks";
 import { cn, getErrorMessage } from "@/lib";
@@ -76,20 +76,18 @@ const updateCategory = useUpdateCategory();
                       href={ROUTES.BACKOFFICE.CATEGORY_EDIT(category.slug)}
                       className="hover:text-primary-600 hover:underline"
                       >
-                          {category?.image ? (
-                            <Image 
+                        {category?.image ? (
+                            <AppImage 
                               src={category.image}
                               alt='Category'
                               width={60}
                               height={60}
                               className='rounded-md object-cover h-15 w-15'
                             />
-                            ):(
-                                <div className='flex items-center justify-center border-2 border-gray-400 text-gray-400 bg-gray-100 px-4 py-3 rounded-md h-15 w-15'>
-                                <ImageIcon size={30} />
-                              </div>
-                            )
-                          }
+                          ):(
+                            <NoImage height={60} width={60} />
+                          )
+                        }
                       </Link>
                     </td>
                     <td className="px-4 py-3 font-medium text-gray-900">

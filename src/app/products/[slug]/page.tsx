@@ -6,7 +6,7 @@ import { use, useState } from 'react';
 
 import { Badge, Button, Loading, Rating } from '@/components/ui';
 import { APP_CONFIG } from '@/constants';
-import { useAddToCart, useAddToWishlist, useProductById } from '@/hooks';
+import { useAddToCart, useAddToWishlist, useProductBySlug } from '@/hooks';
 import { getErrorMessage } from '@/lib/api';
 import { calculateDiscountPercentage, cn, formatCurrency } from '@/lib/utils';
 import { toast } from '@/store';
@@ -18,7 +18,7 @@ interface ProductPageProps {
 
 export default function ProductPage({ params }: ProductPageProps) {
   const resolvedParams = use(params);
-  const { data: product, isLoading } = useProductById(resolvedParams.slug);
+  const { data: product, isLoading } = useProductBySlug(resolvedParams.slug);
   const addToCart = useAddToCart();
   const addToWishlist = useAddToWishlist();
 

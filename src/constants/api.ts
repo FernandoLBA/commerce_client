@@ -26,13 +26,14 @@ export const API_ENDPOINTS = {
   PRODUCTS: {
     BASE: '/products',
     BY_SEARCH: (search: string) => `/products/${search}`,
-    UPLOAD_IMAGES: (productId: string) => `/products/${productId}/files/upload`
+    UPLOAD_IMAGES: (productId: string) => `/products/${productId}/files/upload`,
+    DELETE_IMAGE: (imageId: string) => `/products/${imageId}/files/delete`,
   },
 
   // Categories
   CATEGORIES: {
     BASE: '/categories',
-    BY_SEARCH: (slug: string) => `/categories/${slug}`,
+    BY_SEARCH: (search: string) => `/categories/${search}`,
     UPLOAD_IMAGE: (slug: string) => `/categories/${slug}/files/upload`
   },
 

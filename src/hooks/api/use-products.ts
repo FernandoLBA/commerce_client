@@ -1,17 +1,17 @@
+import { QUERY_KEYS } from '@/constants';
+import { productsApi } from '@/lib/api';
+import type {
+  ApiError,
+  PaginatedResponse,
+  Product,
+  ProductFilterParams,
+  ProductWithDetails,
+} from '@/types';
 import {
   useQuery,
   UseQueryOptions,
 } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { QUERY_KEYS } from '@/constants';
-import { productsApi } from '@/lib/api';
-import type {
-  Product,
-  ProductWithDetails,
-  ProductFilterParams,
-  PaginatedResponse,
-  ApiError,
-} from '@/types';
 
 /**
  * Hook to fetch all products
@@ -63,19 +63,19 @@ export function useProduct(
 }
 
 /**
- * Hook to fetch a single product by id
+ * Hook to fetch a single product by slug
  */
-export function useProductById(
-  id: string,
+export function useProductBySlug(
+  slug: string,
   options?: Omit<
     UseQueryOptions<ProductWithDetails, AxiosError<ApiError>>,
     'queryKey' | 'queryFn'
   >
 ) {
   return useQuery({
-    queryKey: QUERY_KEYS.PRODUCT(id),
-    queryFn: () => productsApi.getByIdOrSlug(id),
-    enabled: Boolean(id),
+    queryKey: QUERY_KEYS.PRODUCT(slug),
+    queryFn: () => productsApi.getByIdOrSlug(slug),
+    enabled: Boolean(slug),
     ...options,
   });
 }

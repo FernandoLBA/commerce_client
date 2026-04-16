@@ -1,15 +1,12 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { ArrowLeft, PencilIcon } from 'lucide-react';
-import Image from 'next/image';
+import { ArrowLeft, PencilIcon, Trash } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useForm, type Resolver } from 'react-hook-form';
 
-import { Button, EmptyData, IconButton, IconLinkButton, Input, Loading } from '@/components/ui';
-import { UploadButton } from '@/components/ui/upload-button';
+import { AppImage, Button, EmptyData, IconButton, IconLinkButton, Input, Loading, Skeleton, UploadButton } from '@/components/ui';
 import { allowedFileTypes, FILE_SIZES, ROUTES } from '@/constants';
-import { useCategories, useDisclosure } from '@/hooks';
+import { useCategories, useDisclosure, useUpload } from '@/hooks';
 import { getErrorMessage } from '@/lib/api';
 import { toast } from '@/store';
 import { useUpdateCategory, useUploadCategoryImage } from '../../hooks';
@@ -18,11 +15,18 @@ import { CategoryFormData } from '../../types';
 
 export function CategoryEditForm({ categorySlug }: { categorySlug: string }) {
   const [imageError, setImageError] = useState<string | null>(null);
-  const { isOpen: editImage, handleIsOpen: openEditImage, handleIsClose: closeEditImage } = useDisclosure(false)
+  const [isDeletingImage, setIsDeletingImage] = useState(false);
+  const { isOpen: editImage, handleIsOpen: handleOpen, handleIsClose: handleClose } = useDisclosure(false);
   const { data: categories, isLoading } = useCategories();
+
+  const {files, errorMessage, handleUploadFiles, clearFiles, handleDeleteFile } = useUpload({
+    accept: allowedFileTypes.IMAGE,
+    maxSize: FILE_SIZES.IMAGE,
+    maxFiles: 1,
+  });
+
   const updateCategory = useUpdateCategory();
   const uploadCategoryImage = useUploadCategoryImage();
-  const router = useRouter();
 
   const currentCategory = categories?.find((category) => category.slug === categorySlug);
   
@@ -35,8 +39,11 @@ export function CategoryEditForm({ categorySlug }: { categorySlug: string }) {
     resolver: yupResolver(categorySchema) as unknown as Resolver<CategoryFormData>,
   });
   
-  const handleUpload = async(files: File[]) => {
-    // TODO: Mejor que suba la imagen al darle click a un botón de subir
+  const onUpload = async(files: File[]) => {
+    handleUploadFiles(files);
+  }
+  
+  const onSubmitFiles = async() => {
     try {
       if (!files.length) return;
       
@@ -44,11 +51,13 @@ export function CategoryEditForm({ categorySlug }: { categorySlug: string }) {
         slug: categorySlug,
         file: files[0] as File,
       })
+
       setImageError(null)
     } catch (error) {
       toast.error("Error", getErrorMessage(error));
     } finally {
-      closeEditImage()
+      handleClose();
+      clearFiles();
     }
   }
 
@@ -67,13 +76,14 @@ export function CategoryEditForm({ categorySlug }: { categorySlug: string }) {
   }, [currentCategory, reset]);
 
   const onSubmit = async (data: CategoryFormData) => {
+    const currentImage = isDeletingImage ? "" : currentCategory?.image || undefined;
+
     try {
       await updateCategory.mutateAsync({
         slug: categorySlug,
-        data: { ...data, parentId: data.parentId || undefined, image: data.image || undefined },
+        data: { ...data, parentId: data.parentId || undefined, image: currentImage },
       });
       toast.success('Actualizada', 'Categoría guardada correctamente');
-      router.push(ROUTES.BACKOFFICE.CATEGORIES);
     } catch (error) {
       toast.error('Error', getErrorMessage(error));
     }
@@ -100,35 +110,46 @@ export function CategoryEditForm({ categorySlug }: { categorySlug: string }) {
         <div className='w-full'>
           { currentCategory.image && !editImage ?
             <div className="relative flex justify-start h-full mb-5 rounded-md">
-              <Image
-                alt="Category image"
-                height={150}
-                width={150}
-                src={typeof currentCategory.image === "string" ? currentCategory.image : ""}
-                className="rounded-md w-full h-32 object-cover"
-              />
+              {uploadCategoryImage.isPending || updateCategory.isPending ? (
+                <Skeleton className='h-37.5 w-full rounded-md' />
+              ):( 
+                <AppImage
+                  alt="Category image"
+                  height={150}
+                  width={150}
+                  src={typeof currentCategory.image === "string" ? currentCategory.image : ""}
+                  className="rounded-md w-full h-32 object-cover"
+                />
+              )}
 
-              <IconButton variant='secondary' type='button' className='absolute right-2 bottom-2' onClick={openEditImage}>
-                <PencilIcon size={18} />
-              </IconButton>
+              <div className='absolute right-2 bottom-2 flex flex-end gap-2'>
+                <IconButton type='button' variant='primary' onClick={handleOpen}>
+                  <PencilIcon size={18} />
+                </IconButton>
+
+                <IconButton loading={updateCategory.isPending} variant='danger' onClick={() => setIsDeletingImage(true)}>
+                  <Trash size={18} />
+                </IconButton>
+              </div>
             </div>
           :
             <div>
               <UploadButton 
-                onUpload={ handleUpload }
+                onUpload={ onUpload }
                 accept={ allowedFileTypes.IMAGE }
-                multiple={ false }
                 maxSize={ FILE_SIZES.IMAGE }
                 maxFiles={ 1 }
-                showPreview={ true }
-                variant={ imageError ? 'danger' : 'primary' }
-                onError={ setImageError }
+                files={files}
+                onCancel={handleClose}
+                onClearFiles={clearFiles}
+                onDeleteFile={handleDeleteFile}
+                error={ imageError || errorMessage }
                 loading={uploadCategoryImage.isPending}
-                disabled={uploadCategoryImage.isPending}
+                disabled={updateCategory.isPending}
+                onSubmit={onSubmitFiles}
               >
                 Cargar imagen
               </UploadButton>
-              {imageError && <p className="mt-1 text-sm text-red-600">{imageError}</p>}
             </div>
           }
         </div>
@@ -138,11 +159,13 @@ export function CategoryEditForm({ categorySlug }: { categorySlug: string }) {
           error={errors.name?.message}
           {...register('name')}
         />
+
         <Input
         label='Slug (URL amigable'
           className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
           {...register('slug')}
         />
+
         <div>
           <label className="mb-1.5 block text-sm font-medium text-gray-700">Descripción</label>
           <textarea
@@ -151,6 +174,7 @@ export function CategoryEditForm({ categorySlug }: { categorySlug: string }) {
             {...register('description')}
           />
         </div>
+
         <Input
           label='Posicionamiento *'
           type="number"
@@ -158,8 +182,10 @@ export function CategoryEditForm({ categorySlug }: { categorySlug: string }) {
           className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
           {...register('displayOrder')}
         />
+
         <div>
           <label className="mb-1.5 block text-sm font-medium text-gray-700">Categoría padre</label>
+
           <select
             className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
             {...register('parentId')}
@@ -174,6 +200,7 @@ export function CategoryEditForm({ categorySlug }: { categorySlug: string }) {
               ))}
           </select>
         </div>
+
         <label className="flex cursor-pointer items-center gap-3">
           <input
             type="checkbox"
@@ -187,6 +214,7 @@ export function CategoryEditForm({ categorySlug }: { categorySlug: string }) {
           <Link href={ROUTES.BACKOFFICE.CATEGORIES}>
             <Button variant="outline" type="button">Cancelar</Button>
           </Link>
+
           <Button variant="primary" type="submit" isLoading={isSubmitting}>
             Guardar cambios
           </Button>

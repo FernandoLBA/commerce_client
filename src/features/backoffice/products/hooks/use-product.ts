@@ -23,3 +23,21 @@ export function useUploadProductImages(
     ...options,
   })
 }
+
+export function useDeleteProductImage(
+    options?: UseMutationOptions<string, 
+    AxiosError<ApiError>, 
+    { imageId: string }
+  >
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ imageId }) => adminApi.deleteProductImage(imageId),
+    onSuccess: (_, { imageId }) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PRODUCTS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PRODUCT(imageId) });
+    },
+    ...options,
+  });
+}

@@ -20,5 +20,6 @@ export const useDisclosure = (initialState = false) => {
     handleIsOpen,
     handleIsClose,
     handleToggle,
+    setIsOpen,
   }
 }
