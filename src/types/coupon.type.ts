@@ -1,5 +1,5 @@
 import type { DiscountType } from '@/constants';
-import type { BaseEntity } from './common';
+import type { BaseEntity } from './common.type';
 
 /**
  * Coupon entity

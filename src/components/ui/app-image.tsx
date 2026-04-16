@@ -1,13 +1,15 @@
+import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import Image from "next/image";
 
 export interface AppImageProps {
-  src: string;
+  src: string | StaticImport;
   alt?: string;
   sizes?: string;
   height?: number;
   width?: number;
   loading?: "eager" | "lazy" | undefined;
   className?: string;
+  fill?: boolean;
 }
 
 export const AppImage = ({ 
@@ -18,14 +20,26 @@ export const AppImage = ({
   width = 50,
   loading = 'eager',
   className,
+  fill = false,
 }: AppImageProps) => {
-  return (
+  return fill ? (
     <Image
+      alt={ alt }
+      src={ src } 
+      fill
+      loading={ loading }
+      priority
+      sizes={ sizes }
+      className={ className }
+      />
+    ) : (
+      <Image
       alt={ alt }
       src={ src } 
       height={ height }
       width={ width }
       loading={ loading }
+      priority
       sizes={ sizes }
       className={ className }
     />

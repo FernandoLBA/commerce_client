@@ -12,11 +12,10 @@ import {
   User,
   X,
 } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
-import { Button } from '@/components/ui';
+import { AppImage, Button } from '@/components/ui';
 import { APP_CONFIG, ROUTES } from '@/constants';
 import { useCart } from '@/hooks';
 import { cn } from '@/lib/utils';
@@ -68,7 +67,7 @@ export function Header() {
           {/* Logo */}
           <div className="flex items-center">
             <Link href={ROUTES.HOME} className="text-xl font-bold text-primary-600">
-            <Image src={logo} alt="Logo" className="h-50 w-auto mr-2" />
+            <AppImage src={logo} alt="Logo" className="h-50 w-auto mr-2" />
               {/* {APP_CONFIG.NAME} */}
             </Link>
           </div>

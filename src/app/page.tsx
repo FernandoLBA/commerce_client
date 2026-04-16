@@ -153,8 +153,7 @@ export default function HomePage() {
                       <AppImage
                         src={category.image}
                         alt={category.name}
-                        loading='eager'
-                        sizes=''
+                        fill
                         className="object-cover transition-transform group-hover:scale-105"
                       />
                     ) : (

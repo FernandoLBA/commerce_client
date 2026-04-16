@@ -1,5 +1,5 @@
 import type { UserRole } from '@/constants';
-import type { BaseEntity } from './common';
+import type { BaseEntity } from './common.type';
 
 /**
  * User entity

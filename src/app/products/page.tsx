@@ -1,13 +1,13 @@
 'use client';
 
-import { Badge, Button, ProductGridSkeleton } from '@/components/ui';
+import { Grid3X3, List, SlidersHorizontal } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
+
+import { AppImage, Badge, Button, ProductGridSkeleton } from '@/components/ui';
 import { ROUTES } from '@/constants';
 import { useCategories, useProducts } from '@/hooks';
 import { calculateDiscountPercentage, cn, formatCurrency } from '@/lib/utils';
-import { Grid3X3, List, SlidersHorizontal } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useState } from 'react';
 
 type ViewMode = 'grid' | 'list';
 
@@ -137,7 +137,7 @@ export default function ProductsPage() {
                       )}
                     >
                       {product.images?.[0] ? (
-                        <Image
+                        <AppImage
                           src={product.images[0].url}
                           alt={product.images[0].alt ?? product.name}
                           fill

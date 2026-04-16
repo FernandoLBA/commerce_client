@@ -1,1 +1,1 @@
-export * from './productFormdata.type';
+export * from './product-form-data.type';

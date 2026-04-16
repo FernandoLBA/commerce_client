@@ -1,2 +1,2 @@
-export * from './use-files';
-export * from './useParseFiles';
+export * from './use-file';
+export * from './use-parseFiles';

@@ -1,1 +1,1 @@
-export * from './categoryFormData.type';
+export * from './category-form-data.type';

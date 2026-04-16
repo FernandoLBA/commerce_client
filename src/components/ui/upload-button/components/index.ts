@@ -1,1 +1,1 @@
-export * from './UploadedFilesList';
+export * from './uploaded-files-list';

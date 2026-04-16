@@ -1,6 +1,6 @@
 import type { OrderStatus, PaymentMethod, PaymentStatus, ShippingCarrier, ShippingStatus } from '@/constants';
-import type { BaseEntity } from './common';
-import type { Product, ProductVariant } from './product';
+import type { BaseEntity } from './common.type';
+import type { Product, ProductVariant } from './product.type';
 
 /**
  * Order entity

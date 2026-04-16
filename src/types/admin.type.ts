@@ -1,5 +1,5 @@
 import type { OrderStatus } from '@/constants';
-import type { PaginationParams, SortParams } from './common';
+import type { PaginationParams, SortParams } from './common.type';
 
 /**
  * Admin dashboard statistics
@@ -15,42 +15,42 @@ export interface AdminStats {
   monthlyRevenue: number;
 }
 
-/**
- * Create product data (admin)
- */
-export interface CreateProductData {
-  name: string;
-  slug?: string;
-  description?: string;
-  shortDescription?: string;
-  price: number;
-  compareAtPrice?: number;
-  stock: number;
-  isActive?: boolean;
-  categoryId?: string;
-}
+// /**
+//  * Create product data (admin)
+//  */
+// export interface CreateProductData {
+//   name: string;
+//   slug?: string;
+//   description?: string;
+//   shortDescription?: string;
+//   price: number;
+//   compareAtPrice?: number;
+//   stock: number;
+//   isActive?: boolean;
+//   categoryId?: string;
+// }
 
-/**
- * Update product data (admin)
- */
-export type UpdateProductData = Partial<CreateProductData>;
+// /**
+//  * Update product data (admin)
+//  */
+// export type UpdateProductData = Partial<CreateProductData>;
 
-/**
- * Create category data (admin)
- */
-export interface CreateCategoryData {
-  name: string;
-  slug?: string;
-  description?: string;
-  parentId?: string;
-  isActive?: boolean;
-  displayOrder?: number;
-}
+// /**
+//  * Create category data (admin)
+//  */
+// export interface CreateCategoryData {
+//   name: string;
+//   slug?: string;
+//   description?: string;
+//   parentId?: string;
+//   isActive?: boolean;
+//   displayOrder?: number;
+// }
 
-/**
- * Update category data (admin)
- */
-export type UpdateCategoryData = Partial<CreateCategoryData>;
+// /**
+//  * Update category data (admin)
+//  */
+// export type UpdateCategoryData = Partial<CreateCategoryData>;
 
 /**
  * Update order details/status (admin)
