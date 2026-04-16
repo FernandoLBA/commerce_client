@@ -1,2 +1,2 @@
-export * from './QuickLink';
-export * from './StatCard';
+export * from './quick-link';
+export * from './stat-card';

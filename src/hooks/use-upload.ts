@@ -8,7 +8,6 @@ interface UseUploaProps {
 }
 
 export const useUpload = ({ accept, maxSize, maxFiles, dbFilesCount = 0 }: UseUploaProps) => {
-  console.log("🚀 ~ useUpload ~ dbFilesCount:", dbFilesCount)
   const [files, setFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
@@ -20,11 +19,9 @@ export const useUpload = ({ accept, maxSize, maxFiles, dbFilesCount = 0 }: UseUp
    * Handle files counts
    */
   const handleFilesCount = useCallback((newFiles: File[]) => {
-    console.log("🚀 ~ useUpload ~ dbFiles:", dbFilesCount)
     const total = dbFilesCount + newFiles.length;
     const remainingFiles = maxFiles - total;
     const isMaxExceeded = total > maxFiles;
-    console.log("🚀 ~ handleFilesCount:", {total, remainingFiles, isMaxExceeded})
 
     setFilesCount(total);
     setRemainingFiles(remainingFiles);
@@ -113,7 +110,6 @@ export const useUpload = ({ accept, maxSize, maxFiles, dbFilesCount = 0 }: UseUp
    */
   const handleValidateQuantity = useCallback((newFiles: File[]) => {
     const { isMaxExceeded, remainingFiles } = handleFilesCount(newFiles);
-    console.log("🚀 ~ handleValidateQuantity:", {isMaxExceeded, newFiles, remainingFiles})
     
     if(isMaxExceeded) {
       handleErrors(`La cantidad de archivos seleccionados excede el máximo permitido de ${remainingFiles}.`);
@@ -177,8 +173,6 @@ export const useUpload = ({ accept, maxSize, maxFiles, dbFilesCount = 0 }: UseUp
 
     return acceptedTypesArray.join(', ');
   }, []);
-
-  console.log({filesCount, isMaxExceeded, remainingFiles,});
 
   return {
     files,

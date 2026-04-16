@@ -50,10 +50,8 @@ export function UploadButton({
 
   const uploadedFilesMemo = useMemo(() => filesUploaded, [filesUploaded]);
 
-  const { allowedExtensions, filesCount, isMaxExceeded, remainingFiles } = useUpload({ accept, maxSize, maxFiles, dbFilesCount: uploadedFilesMemo });
+  const { allowedExtensions, isMaxExceeded, remainingFiles } = useUpload({ accept, maxSize, maxFiles, dbFilesCount: uploadedFilesMemo });
   
-  console.log("🚀 ~ UploadButton:", {filesCount, isMaxExceeded, remainingFiles, uploadedFilesMemo})
-
   const handleDeleteFiles = useCallback(() => {
     clearParsedFiles();
     onClearFiles();
@@ -68,16 +66,8 @@ export function UploadButton({
   const handleFileSelect = useCallback(
     (newFiles: FileList | null) => {
       if (!newFiles) return;
-
-      // if (error && error?.length > 0) {
-      //   return;
-      // }
       
-      console.log("🚀 ~ UploadButton ~ 2:", newFiles)
       handleParseFiles(newFiles, 'pending');
-      
-      console.log("🚀 ~ UploadButton ~ parsed:", parsedFiles)
-          
       onUpload(Array.from(newFiles), accept, maxSize, maxFiles);
 
       // Marcar como exitosos
@@ -97,7 +87,6 @@ export function UploadButton({
       maxSize, 
       error,
       onUpload, 
-      parsedFiles, 
       handleParseFiles, 
     ]
   );

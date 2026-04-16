@@ -1,13 +1,13 @@
 'use client';
 
-import { Badge, Button, ProductGridSkeleton } from '@/components/ui';
+import { Grid3X3, List, SlidersHorizontal } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
+
+import { AppImage, Badge, Button, ProductGridSkeleton } from '@/components/ui';
 import { ROUTES } from '@/constants';
 import { useCategories, useProducts } from '@/hooks';
 import { calculateDiscountPercentage, cn, formatCurrency } from '@/lib/utils';
-import { Grid3X3, List, SlidersHorizontal } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useState } from 'react';
 
 type ViewMode = 'grid' | 'list';
 
@@ -25,9 +25,7 @@ export default function ProductsPage() {
       {/* Page header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Productos</h1>
-        <p className="mt-2 text-gray-600">
-          Explora nuestra colección de productos
-        </p>
+        <p className="mt-2 text-gray-600">Explora nuestra colección de productos</p>
       </div>
 
       <div className="flex gap-8">
@@ -44,7 +42,7 @@ export default function ProductsPage() {
                     className={cn(
                       'w-full text-left text-sm transition-colors',
                       !selectedCategory
-                        ? 'font-medium text-primary-600'
+                        ? 'text-primary-600 font-medium'
                         : 'text-gray-600 hover:text-gray-900'
                     )}
                   >
@@ -58,7 +56,7 @@ export default function ProductsPage() {
                       className={cn(
                         'w-full text-left text-sm transition-colors',
                         selectedCategory === category.id
-                          ? 'font-medium text-primary-600'
+                          ? 'text-primary-600 font-medium'
                           : 'text-gray-600 hover:text-gray-900'
                       )}
                     >
@@ -75,9 +73,7 @@ export default function ProductsPage() {
         <div className="flex-1">
           {/* Toolbar */}
           <div className="mb-6 flex items-center justify-between">
-            <p className="text-sm text-gray-600">
-              {products?.length ?? 0} productos encontrados
-            </p>
+            <p className="text-sm text-gray-600">{products?.length ?? 0} productos encontrados</p>
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -137,12 +133,11 @@ export default function ProductsPage() {
                       )}
                     >
                       {product.images?.[0] ? (
-                        <Image
+                        <AppImage
                           src={product.images[0].url}
                           alt={product.images[0].alt ?? product.name}
                           fill
                           className="object-cover transition-transform group-hover:scale-105"
-                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center text-gray-400">
@@ -150,10 +145,7 @@ export default function ProductsPage() {
                         </div>
                       )}
                       {discount > 0 && (
-                        <Badge
-                          variant="error"
-                          className="absolute left-2 top-2 font-bold"
-                        >
+                        <Badge variant="error" className="absolute top-2 left-2 font-bold">
                           -{discount}%
                         </Badge>
                       )}
@@ -161,11 +153,11 @@ export default function ProductsPage() {
 
                     {/* Content */}
                     <div className="p-4">
-                      <h3 className="font-medium text-gray-900 line-clamp-2 group-hover:text-primary-600">
+                      <h3 className="group-hover:text-primary-600 line-clamp-2 font-medium text-gray-900">
                         {product.name}
                       </h3>
                       {viewMode === 'list' && product.shortDescription && (
-                        <p className="mt-1 text-sm text-gray-500 line-clamp-2">
+                        <p className="mt-1 line-clamp-2 text-sm text-gray-500">
                           {product.shortDescription}
                         </p>
                       )}

@@ -1,6 +1,6 @@
-import type { BaseEntity } from './common';
-import type { User } from './user';
-import type { Product } from './product';
+import type { BaseEntity } from './common.type';
+import type { User } from './user.type';
+import type { Product } from './product.type';
 
 /**
  * Review entity
