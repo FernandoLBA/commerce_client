@@ -1,46 +1,60 @@
-import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import { ImageProps } from "next/dist/shared/lib/get-img-props";
 import Image from "next/image";
 
-export interface AppImageProps {
-  src: string | StaticImport;
+type BaseProps = {
+  src: ImageProps["src"];
   alt?: string;
-  sizes?: string;
-  height?: number;
-  width?: number;
-  loading?: "eager" | "lazy" | undefined;
   className?: string;
-  fill?: boolean;
+  priority?: boolean;
 }
+
+type FillMode = {
+  fill: true;
+  sizes?: string;
+  width?: never;
+  height?: never;
+}
+
+type SizeMode = {
+  fill?: false;
+  sizes?: string;
+  width?: number;
+  height?: number;
+}
+
+export type AppImageProps = BaseProps & (FillMode | SizeMode);
 
 export const AppImage = ({ 
   src, 
-  alt = `image-${Date.now()}`,
-  sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
-  height = 50,
-  width = 50,
-  loading = 'eager',
+  alt = "",
   className,
+  priority = false,
   fill = false,
+  sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
+  ...rest
 }: AppImageProps) => {
-  return fill ? (
-    <Image
-      alt={ alt }
-      src={ src } 
-      fill
-      loading={ loading }
-      priority
-      sizes={ sizes }
-      className={ className }
-      />
-    ) : (
+  if (fill) {
+    return (
       <Image
-      alt={ alt }
+        alt={ alt }
+        src={ src } 
+        fill
+        sizes={ sizes }
+        priority={ priority }
+        className={ className }
+      />
+    )
+  }
+
+  const { width = 50, height = 50 } = rest as SizeMode;
+
+  return (
+    <Image
       src={ src } 
-      height={ height }
+      alt={ alt }
       width={ width }
-      loading={ loading }
-      priority
-      sizes={ sizes }
+      height={ height }
+      priority={ priority }
       className={ className }
     />
   )
