@@ -1,405 +1,340 @@
-# E-Commerce Frontend - Manual del Proyecto
+# E-Commerce Frontend — Project Manual
 
-## 📋 Descripción General
+> This manual describes the **actual** state of the code in `src/` (audited 2026-09-22). For the history of discrepancies found against previous versions of this document, see [`../INCONSISTENCIES.md`](./INCONSISTENCIES.md) (kept in Spanish).
 
-Este es el frontend de una aplicación de comercio electrónico construida con tecnologías modernas. Está diseñado para ser escalable, mantenible y testeable, siguiendo las mejores prácticas de desarrollo.
+## 📋 Overview
 
-## 🚀 Tecnologías Utilizadas
+Frontend for an e-commerce application built with Next.js (App Router) and TypeScript. It covers two surfaces:
 
-| Tecnología | Versión | Propósito |
+- **Public storefront**: product catalog, product detail with reviews, cart, checkout, user account (profile, orders, addresses, wishlist).
+- **Backoffice / admin**: management of products, categories, orders, users, and reviews, protected by the `ADMIN` role.
+
+## 🚀 Technologies Used
+
+| Technology | Version (package.json) | Purpose |
 |------------|---------|-----------|
-| **Next.js** | 15+ | Framework React con App Router |
-| **TypeScript** | 5+ | Tipado estático |
-| **Tailwind CSS** | 4+ | Estilos utilitarios |
-| **TanStack Query** | 5+ | Estado del servidor y caché |
-| **Zustand** | 5+ | Estado global del cliente |
-| **React Hook Form** | 7+ | Manejo de formularios |
-| **Yup** | 1+ | Validación de schemas |
-| **Axios** | 1+ | Cliente HTTP |
-| **Lucide React** | - | Iconos |
+| **Next.js** | 16.2.1 | React framework with App Router |
+| **React** | 19.2.3 | UI |
+| **TypeScript** | 5.x | Static typing |
+| **Tailwind CSS** | 4.x | Utility styling (CSS-first config, no `tailwind.config.ts`) |
+| **TanStack Query** | 5.90.x | Server state and caching |
+| **Zustand** | 5.0.x | Client global state |
+| **React Hook Form** | 7.71.x | Form handling |
+| **Yup** | 1.7.x | Schema validation |
+| **Axios** | 1.13.x | HTTP client |
+| **Lucide React** | 0.563.x | Icons |
+| **clsx / tailwind-merge** | — | Conditional class composition (`cn()`) |
 
-## 📁 Estructura del Proyecto
+No testing library is currently installed (see [Testing](#-testing)).
+
+## 📁 Project Structure
 
 ```
-client/
-├── docs/                          # Documentación
-│   ├── CODING_RULES.md           # Reglas de código
-│   └── PROJECT_MANUAL.md         # Este archivo
+commerce_client/
+├── docs/                              # Documentation
+│   ├── CODING_RULES.md               # Coding rules and conventions
+│   └── PROJECT_MANUAL.md             # This file
 │
-├── public/                        # Archivos estáticos
+├── public/
+│   ├── images/                        # Image assets (includes the logo)
+│   └── *.svg                          # Loose icons (inherited from the Next.js template)
 │
 ├── src/
-│   ├── app/                       # App Router de Next.js
-│   │   ├── layout.tsx            # Layout principal
-│   │   ├── page.tsx              # Página de inicio
-│   │   ├── globals.css           # Estilos globales
-│   │   ├── auth/                 # Autenticación
-│   │   │   ├── login/
-│   │   │   └── register/
-│   │   ├── products/             # Productos
-│   │   │   ├── page.tsx          # Listado
-│   │   │   └── [slug]/           # Detalle
-│   │   ├── cart/                 # Carrito
-│   │   ├── checkout/             # Proceso de compra
-│   │   └── account/              # Área de usuario
-│   │       ├── layout.tsx        # Layout de cuenta
-│   │       ├── profile/          # Perfil
-│   │       ├── orders/           # Pedidos
-│   │       ├── addresses/        # Direcciones
-│   │       ├── wishlist/         # Lista de deseos
-│   │       └── settings/         # Configuración
+│   ├── app/                           # Next.js App Router — ROUTES ONLY
+│   │   ├── layout.tsx                # Root layout (Header, Footer, ToastContainer, Providers)
+│   │   ├── page.tsx                  # Home
+│   │   ├── globals.css               # Global styles + Tailwind 4 theme
+│   │   ├── auth/                     # login, register, activate-account/[token],
+│   │   │                             # activate-notification, forgot-password,
+│   │   │                             # password-reset/[token], resend-activation
+│   │   ├── products/                 # Listing and detail ([slug])
+│   │   ├── cart/                     # Cart
+│   │   ├── checkout/                 # Checkout
+│   │   ├── account/                  # Layout + profile, orders (+ [orderId]),
+│   │   │                             # addresses, wishlist, settings
+│   │   └── backoffice/               # Layout + dashboard, products (+ [slug], new),
+│   │                                 # categories (+ [slug], new), orders (+ [id]),
+│   │                                 # users, reviews
 │   │
-│   ├── components/               # Componentes React
-│   │   ├── ui/                   # Componentes base
-│   │   │   ├── Button.tsx
-│   │   │   ├── Input.tsx
-│   │   │   ├── Modal.tsx
-│   │   │   ├── Loading.tsx
-│   │   │   ├── Rating.tsx
-│   │   │   ├── Badge.tsx
-│   │   │   └── Toast.tsx
-│   │   └── layout/               # Componentes de layout
-│   │       ├── Header.tsx
-│   │       └── Footer.tsx
+│   ├── components/
+│   │   ├── ui/                       # Base components: button, input, modal, badge,
+│   │   │                             # rating, loading (Skeleton/Spinner), toast,
+│   │   │                             # app-image, empty-data, icon-button,
+│   │   │                             # icon-link-button, no-image, return-button,
+│   │   │                             # upload-button/ (subfolder with its own hooks/components)
+│   │   └── layout/                   # header, footer, backoffice-sidebar
 │   │
-│   ├── constants/                # Constantes y enums
-│   │   ├── index.ts              # Re-exports
-│   │   ├── enums.ts              # Enumeraciones
-│   │   ├── api.ts                # Config de API
-│   │   ├── app.ts                # Config general
-│   │   └── ui.ts                 # Constantes de UI
+│   ├── features/                     # Feature-based modules (page logic + UI)
+│   │   └── backoffice/
+│   │       ├── layout.tsx / page.tsx
+│   │       ├── components/           # quick-link, stat-card
+│   │       ├── categories/           # hooks, schemas (Yup), types, page components
+│   │       └── products/             # hooks, schemas (Yup), types, page components
 │   │
-│   ├── hooks/                    # Custom hooks
-│   │   └── api/                  # Hooks de TanStack Query
-│   │       ├── index.ts
-│   │       ├── useAuth.ts
-│   │       ├── useProducts.ts
-│   │       ├── useCategories.ts
-│   │       ├── useCart.ts
-│   │       ├── useOrders.ts
-│   │       ├── useUsers.ts
-│   │       ├── useWishlist.ts
-│   │       └── useReviews.ts
+│   ├── constants/
+│   │   ├── index.ts                  # Barrel export
+│   │   ├── enums.ts                  # Enums mirroring the backend (UserRole, OrderStatus,
+│   │   │                             # PaymentStatus, PaymentMethod, ShippingCarrier,
+│   │   │                             # ShippingStatus, MovementType, DiscountType)
+│   │   ├── api.ts                    # API_ENDPOINTS per domain
+│   │   ├── app.ts                    # APP_CONFIG, STORAGE_KEYS, QUERY_KEYS,
+│   │   │                             # HTTP_STATUS, VALIDATION, FILE_SIZES
+│   │   ├── ui.ts                     # ROUTES, BREAKPOINTS, Z_INDEX,
+│   │   │                             # ANIMATION_DURATION, *_CONFIG (enum display config)
+│   │   └── allowed-file-types.ts     # Allowed file types for uploads
 │   │
-│   ├── lib/                      # Utilidades
-│   │   ├── api/                  # Servicios de API
-│   │   │   ├── client.ts         # Cliente Axios
-│   │   │   ├── auth.ts
-│   │   │   ├── products.ts
-│   │   │   ├── categories.ts
-│   │   │   ├── cart.ts
-│   │   │   ├── orders.ts
-│   │   │   ├── users.ts
-│   │   │   ├── wishlist.ts
-│   │   │   └── reviews.ts
-│   │   ├── utils.ts              # Funciones utilitarias
-│   │   └── validations.ts        # Schemas de Yup
+│   ├── hooks/
+│   │   ├── api/                      # TanStack Query hooks: use-auth, use-admin,
+│   │   │                             # use-cart, use-categories, use-orders,
+│   │   │                             # use-products, use-reviews, use-users, use-wishlist
+│   │   ├── use-disclosure.ts         # Utility hook (open/close/toggle)
+│   │   └── use-upload.ts             # File upload hook
 │   │
-│   ├── providers/                # Context Providers
-│   │   ├── index.tsx             # Provider combinado
-│   │   ├── QueryProvider.tsx     # TanStack Query
-│   │   └── AuthProvider.tsx      # Hidratación de auth
+│   ├── lib/
+│   │   ├── api/                      # client.ts (Axios) + per-domain services
+│   │   │                             # (auth, products, categories, cart, orders,
+│   │   │                             # users, wishlist, reviews, admin)
+│   │   ├── utils.ts                  # cn, formatCurrency, formatDate,
+│   │   │                             # formatRelativeTime, truncateText, getInitials,
+│   │   │                             # slugify, debounce, calculateDiscountPercentage,
+│   │   │                             # isEmpty, generateId, formatFileSize
+│   │   ├── cookies.ts                # set/removeAuthCookie (cookie read by the middleware)
+│   │   └── validations.ts            # Yup schemas
 │   │
-│   ├── store/                    # Zustand Stores
-│   │   ├── index.ts
-│   │   ├── authStore.ts          # Estado de autenticación
-│   │   ├── cartStore.ts          # Carrito local
-│   │   └── uiStore.ts            # UI (toasts, modals)
+│   ├── providers/
+│   │   ├── index.tsx                 # Providers (wraps QueryProvider + AuthProvider)
+│   │   ├── query-provider.tsx        # QueryClientProvider + Devtools
+│   │   └── auth-provider.tsx         # Auth store hydration
 │   │
-│   └── types/                    # Tipos TypeScript
-│       └── index.ts              # Todas las interfaces
+│   ├── store/                        # Zustand stores
+│   │   ├── auth.ts                   # useAuthStore (persist), useAuthHydrated,
+│   │   │                             # useIsAdmin, useUserId
+│   │   ├── cart.ts                   # Local cart (unauthenticated users)
+│   │   └── ui.ts                     # Sidebar, mobile menu, search, toasts,
+│   │                                 # modals, theme, global loading; `toast` helper
+│   │
+│   ├── types/                        # Domain types, one file per entity
+│   │   ├── common.type.ts, user.type.ts, product.type.ts, cart.type.ts,
+│   │   │   order.type.ts, wishlist.type.ts, review.type.ts, coupon.type.ts,
+│   │   │   admin.type.ts
+│   │   └── css.d.ts                  # Declarations for CSS/SVG imports
+│   │
+│   └── regex/                        # Shared regular expressions
 │
-├── .env.example                   # Variables de entorno
-├── next.config.ts                 # Config de Next.js
-├── tailwind.config.ts             # Config de Tailwind
-├── tsconfig.json                  # Config de TypeScript
-└── package.json                   # Dependencias
+├── .env.example                       # Reference environment variables
+├── next.config.ts                     # Next.js config (image remotePatterns)
+├── eslint.config.mjs                  # ESLint flat config (eslint-config-next)
+├── .prettierrc                        # Prettier + prettier-plugin-tailwindcss
+├── tsconfig.json                      # TypeScript config + path aliases
+└── package.json                       # Dependencies and scripts
 ```
 
-## 🔧 Instalación y Configuración
+> **Note**: `tailwind.config.ts` does not exist. Tailwind 4 is configured via CSS (`@import "tailwindcss"` and an `@theme inline` block in `src/app/globals.css`), not a JS/TS config file.
 
-### Requisitos Previos
+## 🔧 Installation and Setup
 
-- Node.js >= 18.x
-- pnpm >= 8.x (recomendado) o npm
-- Backend API ejecutándose
+### Prerequisites
 
-### Instalación
+- Node.js ≥ 20.x (LTS recommended)
+- pnpm ≥ 9.x — the only supported package manager (the repo ships `pnpm-lock.yaml`, not `package-lock.json` or `yarn.lock`)
+- A running, reachable backend API
+
+### Installation
 
 ```bash
-# Clonar repositorio
+# Clone the repository
 git clone <repo-url>
-cd client
+cd commerce_client
 
-# Instalar dependencias
+# Install dependencies
 pnpm install
 
-# Configurar variables de entorno
+# Configure environment variables
 cp .env.example .env.local
 
-# Iniciar en desarrollo
+# Start the dev server
 pnpm dev
 ```
 
-### Variables de Entorno
+### Environment Variables
 
 ```env
 # .env.local
-NEXT_PUBLIC_API_URL=http://localhost:3000/api
-NEXT_PUBLIC_APP_NAME=Mi Tienda
-NEXT_PUBLIC_APP_URL=http://localhost:3001
+NEXT_PUBLIC_API_URL=http://localhost:3001/api
+NEXT_PUBLIC_APP_NAME=E-commerce Brand
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_ENABLE_REVIEWS=true
+NEXT_PUBLIC_ENABLE_WISHLIST=true
 ```
 
-## 🏗️ Arquitectura
+All of them default in `src/constants/app.ts` (`APP_CONFIG`). If `.env.local` doesn't exist, the app still works pointing at `http://localhost:3001`, with `APP_CONFIG.FEATURES.REVIEWS_ENABLED` and `WISHLIST_ENABLED` defaulting to `false` (note that this differs from the `.env.example` defaults).
 
-### Flujo de Datos
+`APP_CONFIG` also fixes `CURRENCY: 'PEN'` and `LOCALE: 'es-PE'` as constants that are not configurable via environment — the current target market is Peru.
+
+## 🏗️ Architecture
+
+### Data Flow
 
 ```
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
 │  Component  │ ──► │    Hook     │ ──► │   API Svc   │
-│             │ ◄── │ (TanStack)  │ ◄── │   (Axios)   │
+│ (app/ or    │ ◄── │ (hooks/api, │ ◄── │  (lib/api,  │
+│  features/) │     │  TanStack)  │     │   Axios)    │
 └─────────────┘     └─────────────┘     └─────────────┘
        │                   │
        │                   ▼
        │            ┌─────────────┐
-       │            │    Cache    │
-       │            │ (Query)     │
+       │            │ Query Cache │
        │            └─────────────┘
-       │
        ▼
 ┌─────────────┐
-│   Zustand   │
-│   (Local)   │
+│   Zustand   │  (auth, local cart, ui)
 └─────────────┘
 ```
 
-### Capas de la Aplicación
+### Application Layers
 
-1. **Presentación (Components)**: UI y lógica de presentación
-2. **Hooks**: Conexión entre componentes y datos
-3. **Servicios (lib/api)**: Comunicación con backend
-4. **Estado (store)**: Estado local de la aplicación
-5. **Tipos**: Contratos de datos
+1. **Presentation** (`app/`, `features/*/components`, `components/`): UI and composition.
+2. **Hooks** (`hooks/api/`): connect components to TanStack Query.
+3. **Services** (`lib/api/`): HTTP communication with the backend via Axios.
+4. **State** (`store/`): persistent/ephemeral client state with Zustand.
+5. **Types** (`types/`): data contracts per domain.
+6. **Constants** (`constants/`): endpoints, routes, enums, configuration — single source of truth for repeated strings/values.
 
-## 📦 Módulos Principales
+### Feature-based pattern (`src/features/`)
 
-### Autenticación
+The products and categories backoffice follows a feature-based pattern: each submodule groups its own `hooks/`, `schemas/` (Yup), `types/`, and page components, instead of scattering them across the global `src/hooks`, `src/lib`, or `src/types` folders. This is the pattern to follow for new, large, self-contained modules (e.g. a future `features/checkout/`); small or cross-cutting modules (Header, Footer, `ui/` components) keep living in the global folders.
+
+> ⚠️ Inside `features/`, several components that are **not** Next.js routes are named `page.tsx` (e.g. `features/backoffice/categories/components/category-edit-form/page.tsx`). This is an inherited, confusing convention — don't repeat it in new code; name these files after what they render (`category-edit-form.tsx`). See [`INCONSISTENCIES.md`](./INCONSISTENCIES.md#5-patrón-pagetsx-reutilizado-para-archivos-que-no-son-rutas).
+
+## 📦 Core Modules
+
+Actual hooks exported by `src/hooks/api/` (check each file for the exact signature; this is a reference map, not a literal copy):
+
+### Authentication (`hooks/api/use-auth.ts`, `store/auth.ts`)
 
 ```typescript
-// Hooks disponibles
-useLogin()        // Iniciar sesión
-useRegister()     // Registrar usuario
-useLogout()       // Cerrar sesión
-useCurrentUser()  // Usuario actual
-useUpdateProfile() // Actualizar perfil
-useUpdatePassword() // Cambiar contraseña
+useLogin()
+useRegister()
+useLogout()
+// + activation / password recovery hooks (activate, resend-activation,
+//   forgot-password, password-reset) — see routes under app/auth/*
 
-// Store
 useAuthStore()
 - user: User | null
 - token: string | null
 - isAuthenticated: boolean
-- login(user, token)
-- logout()
-- setUser(user)
+- setAuth(user, token)
+- clearAuth()
+- updateUser(partialUser)
+
+useAuthHydrated()   // true once the Zustand persist middleware has finished hydrating
+useIsAdmin()        // selector: user?.role === 'ADMIN'
+useUserId()         // selector: user?.id ?? null
 ```
 
-### Productos
+On login/registration, session state is written to **three** places: `localStorage[STORAGE_KEYS.AUTH_TOKEN]`, `localStorage[STORAGE_KEYS.USER]` (manual write in `use-auth.ts`), the persisted Zustand store (`STORAGE_KEYS.AUTH_STORE`), and the `auth_token` cookie (`lib/cookies.ts`, read by `middleware.ts`). This is intentional — the cookie and the plain `localStorage` entries are needed because the edge middleware and the Axios interceptor can't access the Zustand store directly — but they must be kept in sync whenever the auth flow is touched.
+
+### Products (`hooks/api/use-products.ts`, `features/backoffice/products/`)
 
 ```typescript
-// Hooks disponibles
-useProducts(filters)     // Listar productos
-useProduct(slug)         // Detalle de producto
-useProductReviews(id)    // Reseñas de producto
-useCreateReview()        // Crear reseña
-
-// Filtros soportados
+// Supported filters (see src/types/product.type.ts for the exact contract)
 interface ProductFilters {
   page?: number;
   limit?: number;
-  categoryId?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  sortBy?: 'price' | 'name' | 'createdAt';
-  sortOrder?: 'asc' | 'desc';
   search?: string;
   isActive?: boolean;
+  // + additional filters defined in the domain type
 }
 ```
 
-### Carrito
+Admin management (create/edit/delete product, image uploads) lives in `features/backoffice/products/`.
+
+### Cart (`hooks/api/use-cart.ts`, `store/cart.ts`)
+
+Remote cart via TanStack Query for authenticated users; `store/cart.ts` keeps a local Zustand cart for unauthenticated flows.
+
+### Orders (`hooks/api/use-orders.ts`)
+
+Order statuses (`OrderStatus`, in `constants/enums.ts`, mirroring the backend enum):
 
 ```typescript
-// Hooks disponibles
-useCart()              // Obtener carrito
-useAddToCart()         // Agregar item
-useUpdateCartItem()    // Actualizar cantidad
-useRemoveFromCart()    // Eliminar item
-useClearCart()         // Vaciar carrito
-
-// Store local (para usuarios no autenticados)
-useCartStore()
-- items: CartItem[]
-- addItem(item)
-- updateQuantity(id, quantity)
-- removeItem(id)
-- clearCart()
-- getTotal()
+PENDING | CONFIRMED | PROCESSING | SHIPPED | DELIVERED | CANCELLED | REFUNDED
 ```
 
-### Pedidos
+Each status has its visual representation (label, color, icon) in `ORDER_STATUS_CONFIG` (`constants/ui.ts`) — use that config instead of mapping the string manually in the component.
 
-```typescript
-// Hooks disponibles
-useOrders(filters)     // Listar pedidos
-useOrder(id)           // Detalle de pedido
-useCreateOrder()       // Crear pedido
-useCancelOrder()       // Cancelar pedido
+### Wishlist (`hooks/api/use-wishlist.ts`)
 
-// Estados de pedido
-enum OrderStatus {
-  PENDING
-  CONFIRMED
-  PROCESSING
-  SHIPPED
-  DELIVERED
-  CANCELLED
-  REFUNDED
-}
-```
+Toggleable via `NEXT_PUBLIC_ENABLE_WISHLIST`.
 
-### Wishlist
+### Reviews (`hooks/api/use-reviews.ts`)
 
-```typescript
-// Hooks disponibles
-useWishlist()           // Obtener lista
-useAddToWishlist()      // Agregar producto
-useRemoveFromWishlist() // Eliminar producto
-```
+Toggleable via `NEXT_PUBLIC_ENABLE_REVIEWS`.
 
-## 🎨 Componentes UI
+### Admin (`hooks/api/use-admin.ts`, `features/backoffice/`)
 
-### Button
+Stats, user management, and review approval from the backoffice; protected by `useIsAdmin()` and the route middleware.
+
+## 🎨 UI Components (`src/components/ui/`)
+
+Actual exports (`src/components/ui/index.ts`): `AppImage`, `Badge` (+ `DiscountBadge`, `StockBadge`), `Button`, `EmptyData`, `IconButton`, `IconLinkButton`, `Input`, `Loading` (+ `Skeleton`, `Spinner`, `ProductCardSkeleton`, `ProductGridSkeleton`, `UploadButtonSkeleton`), `Modal`, `Rating` (+ `RatingInput`), `ToastContainer`, `UploadButton`. `NoImage` and `ReturnButton` exist as files but are imported directly (they're not in the `index.ts` barrel).
+
+### Toast (Notifications)
+
+Global system via `store/ui.ts`, rendered by `<ToastContainer />` in the root layout.
 
 ```tsx
-<Button 
-  variant="primary" | "secondary" | "outline" | "ghost" | "danger"
-  size="sm" | "md" | "lg"
-  isLoading={boolean}
-  disabled={boolean}
->
-  Click me
-</Button>
-```
-
-### Input
-
-```tsx
-<Input
-  label="Email"
-  type="email"
-  error="Mensaje de error"
-  helperText="Texto de ayuda"
-  {...register('email')}
-/>
-```
-
-### Modal
-
-```tsx
-<Modal
-  isOpen={boolean}
-  onClose={function}
-  title="Título"
-  size="sm" | "md" | "lg" | "xl"
->
-  Contenido
-</Modal>
-```
-
-### Badge
-
-```tsx
-<Badge variant="default" | "success" | "warning" | "error" | "info">
-  Etiqueta
-</Badge>
-```
-
-### Rating
-
-```tsx
-<Rating 
-  value={4.5} 
-  readonly={boolean}
-  onChange={function}
-  size="sm" | "md" | "lg"
-/>
-```
-
-### Loading
-
-```tsx
-<Loading size="sm" | "md" | "lg" />
-<Skeleton className="h-4 w-32" />
-```
-
-### Toast (Notificaciones)
-
-El sistema de notificaciones usa un store global y un componente `ToastContainer` que se renderiza en el layout principal.
-
-```tsx
-// Usando helpers (recomendado)
+// Recommended usage
 import { toast } from '@/store';
 
-// Tipos disponibles
-toast.success('Título', 'Mensaje opcional');
-toast.error('Error', 'Descripción del error');
-toast.warning('Advertencia', 'Mensaje de advertencia');
-toast.info('Información', 'Mensaje informativo');
+toast.success('Title', 'Optional message');
+toast.error('Error', 'Error description');
+toast.warning('Warning', 'Warning message');
+toast.info('Info', 'Informational message');
 
-// Usando el store directamente
+// Explicit usage (equivalent)
 import { useUIStore } from '@/store';
 
 const { addToast } = useUIStore();
-
 addToast({
   type: 'success' | 'error' | 'warning' | 'info',
-  title: 'Título requerido',
-  message: 'Mensaje opcional',
-  duration: 5000 // ms, default 5000, usar 0 para no auto-cerrar
+  title: 'Required title',
+  message: 'Optional message',
+  duration: 5000, // ms, default 5000, use 0 to disable auto-close
 });
 ```
 
-**Características:**
-- Aparecen en esquina inferior derecha
-- Se auto-cierran después del `duration`
-- Animación de entrada/salida
-- Botón para cerrar manualmente
-- Accesibles con `aria-live`
+`store/ui.ts` also centralizes: sidebar (`isSidebarOpen`), mobile menu, search (`isSearchOpen`, `searchQuery`), generic modals (`activeModal`), and a global loading overlay (`isGlobalLoading`).
 
-## 🔐 Autenticación
+## 🔐 Authentication
 
-### Flujo de Login
+### Login Flow
 
-1. Usuario ingresa credenciales
-2. Se envía petición a `/auth/login`
-3. Backend retorna `{ user, token }`
-4. Token se guarda en `localStorage` (via Zustand persist)
-5. Usuario se redirige a la página destino
+1. User enters credentials at `/auth/login`.
+2. `useLogin()` calls `authApi.login()` (`lib/api/auth.ts`).
+3. Backend returns `{ user, access_token }`.
+4. Persisted to `localStorage` (`AUTH_TOKEN`, `USER`), to the cookie (`setAuthCookie`), and to `useAuthStore` (`setAuth`).
+5. Redirect to the target route (supports `?redirect=` set by the middleware).
 
-### Protección de Rutas
+### Route Protection
+
+Two independent layers of protection, both active:
+
+1. **Next.js middleware** (`src/middleware.ts`, runs at the edge): reads the `auth_token` cookie and redirects before rendering. Protects `ROUTES.ACCOUNT.BASE`, `ROUTES.CHECKOUT`, `ROUTES.BACKOFFICE.BASE`; redirects away from `/auth/login` and `/auth/register` if a cookie is already present.
+2. **Client-side** (recommended pattern in components/layouts that need loading UX before the redirect):
 
 ```tsx
-// En layouts o páginas
 'use client';
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore, useAuthHydrated } from '@/store/auth';
 
 export default function ProtectedPage() {
   const router = useRouter();
-  const { isAuthenticated, isHydrated } = useAuthStore();
+  const isHydrated = useAuthHydrated();
+  const { isAuthenticated } = useAuthStore();
 
   useEffect(() => {
     if (isHydrated && !isAuthenticated) {
@@ -411,212 +346,138 @@ export default function ProtectedPage() {
     return <Loading />;
   }
 
-  return <div>Contenido protegido</div>;
+  return <div>Protected content</div>;
 }
 ```
 
-### Interceptor de Token
+The middleware already blocks access at the route level; this second layer avoids flashes of protected content while the Zustand store hydrates on the client.
 
-El cliente Axios automáticamente:
-- Agrega el token a todas las peticiones
-- Maneja errores 401 (redirige a login)
-- Limpia el estado en caso de token expirado
+### Token Interceptor (`src/lib/api/client.ts`)
+
+- Adds `Authorization: Bearer <token>` (read from `localStorage`) to every request.
+- On `401`, clears `localStorage` and the cookie, and redirects to `/auth/login` (if not already there).
+- Exposes `apiRequest<T>(method, url, data?, config?)` as a typed helper and `getErrorMessage(error)` to normalize API errors.
 
 ## 🌐 API Integration
 
-### Cliente Base
+### Endpoints (`src/constants/api.ts`, `API_ENDPOINTS`)
 
-```typescript
-// lib/api/client.ts
-import axios from 'axios';
-import { API_BASE_URL } from '@/constants/api';
-import { useAuthStore } from '@/store/authStore';
-
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// Request interceptor - agrega token
-apiClient.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().token;
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-```
-
-### Endpoints Disponibles
-
-| Módulo | Endpoints |
+| Module | Main endpoints |
 |--------|-----------|
-| Auth | POST /auth/login, POST /auth/register, GET /auth/me |
-| Products | GET /products, GET /products/:slug |
-| Categories | GET /categories |
-| Cart | GET /cart, POST /cart/items, PATCH /cart/items/:id, DELETE /cart/items/:id |
-| Orders | GET /orders, GET /orders/:id, POST /orders |
-| Users | GET /users/me, PATCH /users/me, GET /users/addresses |
-| Wishlist | GET /wishlist, POST /wishlist, DELETE /wishlist/:id |
-| Reviews | GET /products/:id/reviews, POST /reviews |
+| Auth | `/auth/register`, `/auth/login`, `/auth/validate`, `/auth/activate`, `/auth/resend-activation`, `/auth/forgot-password`, `/auth/password-reset` |
+| Users | `/users/profile`, `/users/addresses`, `/users/addresses/:id` (+ `/default`) |
+| Products | `/products`, `/products/:search`, `/products/:id/files/upload`, `/products/:id/files/delete` |
+| Categories | `/categories`, `/categories/:search`, `/categories/:slug/files/upload` |
+| Cart | `/cart`, `/cart/items`, `/cart/items/:id`, `/cart/validate` |
+| Orders | `/orders`, `/orders/:id`, `/orders/number/:orderNumber`, `/orders/:id/cancel`, `/orders/admin` |
+| Wishlist | `/wishlist`, `/wishlist/:id`, `/wishlist/count`, `/wishlist/check`, `/wishlist/:id/move-to-cart` |
+| Reviews | `/reviews`, `/reviews/:id`, `/reviews/product/:id/rating`, `/reviews/my-reviews`, `/reviews/:id/helpful` |
+| Coupons | `/coupons/validate`, `/coupons/apply` |
+| Payments | `/payments/create-intent`, `/payments/confirm` |
+| Shipping | `/shipping/rates`, `/shipping/track/:trackingNumber` |
+| Admin | `/admin/stats`, `/admin/users`, `/admin/users/:id`, `/admin/reviews`, `/admin/reviews/:id/approve` |
+
+Don't assume every one of these endpoints is implemented on the current backend — this is the contract defined on the frontend side; verify against the real API before relying on a new one.
 
 ## 📱 Responsive Design
 
-El diseño sigue un enfoque **mobile-first**:
+Mobile-first, standard Tailwind breakpoints (also defined in `constants/ui.ts` → `BREAKPOINTS` for use in JS/TS):
 
-```css
-/* Breakpoints de Tailwind */
-sm: 640px   /* Móviles grandes */
-md: 768px   /* Tablets */
-lg: 1024px  /* Laptops */
-xl: 1280px  /* Desktop */
-2xl: 1536px /* Desktop grande */
 ```
-
-### Ejemplo de Grid Responsivo
-
-```tsx
-<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-  {products.map(product => (
-    <ProductCard key={product.id} product={product} />
-  ))}
-</div>
+sm: 640px   md: 768px   lg: 1024px   xl: 1280px   2xl: 1536px
 ```
-
-## 🎯 Funcionalidades Implementadas
-
-### ✅ Completadas
-
-- [x] Autenticación (login/registro)
-- [x] Listado de productos con filtros
-- [x] Detalle de producto
-- [x] Sistema de reseñas
-- [x] Carrito de compras
-- [x] Proceso de checkout
-- [x] Gestión de direcciones
-- [x] Lista de deseos
-- [x] Historial de pedidos
-- [x] Perfil de usuario
-- [x] Configuración de cuenta
-
-### 📝 Pendientes / Mejoras Futuras
-
-- [ ] Sistema de búsqueda avanzado
-- [ ] Filtros de productos en tiempo real
-- [ ] Paginación infinita
-- [ ] PWA (Progressive Web App)
-- [ ] Modo oscuro
-- [ ] Internacionalización (i18n)
-- [ ] Tests unitarios y E2E
-- [ ] SEO optimizado
-- [ ] Analytics
 
 ## 🧪 Testing
 
-### Ejecutar Tests
+**There is no testing infrastructure in the repository at the moment**: no `__tests__/` folder, no `test` script in `package.json`, and no testing dependencies installed.
+
+Before writing tests, the stack needs to be introduced (suggested: **Vitest** + **React Testing Library** for unit/integration, **Playwright** for E2E) along with the corresponding scripts. Until then, change validation relies on:
+
+- `pnpm lint` (ESLint)
+- `pnpm build` (strict TypeScript compilation via `next build`)
+- Manual verification in `pnpm dev`
+
+## 🚀 How to Work in This Project
+
+### Day-to-day workflow
+
+1. Always start from an up-to-date `develop`: `git checkout develop && git pull`.
+2. Create a descriptive branch: `feature/<name>`, `fix/<name>`, or `hotfix/<name>`.
+3. Before touching a module, check whether it already follows the feature-based pattern (`src/features/`) or the classic pattern (global `hooks/`, `lib/api/`, `types/`) and **keep the existing pattern** for that module instead of mixing them.
+4. Reuse what already exists in `constants/` (`ROUTES`, `API_ENDPOINTS`, `QUERY_KEYS`, `STORAGE_KEYS`, enums) before introducing new strings/values.
+5. Run `pnpm lint` and `pnpm build` before opening a PR (there are no automated tests to catch issues for you, see [Testing](#-testing)).
+6. Follow Conventional Commits (`feat(scope): ...`, `fix(scope): ...`) — see [`CODING_RULES.md`](./CODING_RULES.md#git--commits).
+7. Open a PR against `develop`, wait for code review (checklist in `CODING_RULES.md`).
+
+### Where new code goes
+
+| What you're adding | Where it goes |
+|---|---|
+| Generic, reusable UI component (no business logic) | `src/components/ui/` |
+| Global layout component (header, footer, sidebars) | `src/components/layout/` |
+| Large, self-contained module (has its own hooks, schemas, types) | `src/features/<module>/` |
+| Remote data hook (TanStack Query) for an existing entity | `src/hooks/api/use-<entity>.ts` |
+| HTTP service for an existing entity | `src/lib/api/<entity>.ts` |
+| New domain type | `src/types/<entity>.type.ts` + export in `src/types/index.ts` |
+| Constant used in 2+ files | `src/constants/<domain>.ts` |
+| Constant used in a single file | Declared locally in that file (don't create a file in `constants/` just for that) |
+
+### Before opening a PR — quick checklist
+
+- [ ] `pnpm lint` passes with no errors
+- [ ] `pnpm build` compiles with no TypeScript errors
+- [ ] No new unjustified `any`
+- [ ] Repeated strings/values live in `constants/`, not hardcoded
+- [ ] If you touched the auth flow, you reviewed the 4 session-state locations — see [Authentication](#-authentication)
+- [ ] If you added a component under `features/`, it isn't named `page.tsx` unless it's a real `app/` route
+- [ ] Mobile-first verified (tested at a narrow viewport)
+- [ ] Reviewed the full checklist in [`CODING_RULES.md`](./CODING_RULES.md#checklist-de-code-review)
+
+## 🚀 Deployment
+
+### Production Build
 
 ```bash
-# Tests unitarios
-pnpm test
-
-# Tests con coverage
-pnpm test:coverage
-
-# Tests E2E
-pnpm test:e2e
-```
-
-### Estructura de Tests
-
-```
-__tests__/
-├── components/          # Tests de componentes
-│   └── Button.test.tsx
-├── hooks/               # Tests de hooks
-│   └── useProducts.test.ts
-├── utils/               # Tests de utilidades
-│   └── formatCurrency.test.ts
-└── e2e/                 # Tests end-to-end
-    └── checkout.spec.ts
-```
-
-## 🚀 Despliegue
-
-### Build de Producción
-
-```bash
-# Crear build optimizado
 pnpm build
-
-# Iniciar en producción
 pnpm start
 ```
 
-### Variables de Entorno para Producción
+There is no `Dockerfile` or CI/CD pipeline in the repository yet — any automated deployment needs to be set up from scratch (e.g. Vercel, which detects Next.js with no extra configuration).
+
+### Production Environment Variables
 
 ```env
-NEXT_PUBLIC_API_URL=https://api.mitienda.com
-NEXT_PUBLIC_APP_NAME=Mi Tienda
-NEXT_PUBLIC_APP_URL=https://mitienda.com
-```
-
-### Despliegue en Vercel
-
-1. Conectar repositorio en Vercel
-2. Configurar variables de entorno
-3. Desplegar
-
-### Despliegue con Docker
-
-```dockerfile
-FROM node:18-alpine AS builder
-WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
-RUN npm install -g pnpm && pnpm install
-COPY . .
-RUN pnpm build
-
-FROM node:18-alpine AS runner
-WORKDIR /app
-COPY --from=builder /app/next.config.ts ./
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-
-EXPOSE 3000
-CMD ["node", "server.js"]
+NEXT_PUBLIC_API_URL=https://api.your-domain.com
+NEXT_PUBLIC_APP_NAME=Your Store
+NEXT_PUBLIC_APP_URL=https://your-domain.com
+NEXT_PUBLIC_ENABLE_REVIEWS=true
+NEXT_PUBLIC_ENABLE_WISHLIST=true
 ```
 
 ## 🐛 Troubleshooting
 
-### Errores Comunes
-
 **Error: "Hydration mismatch"**
-- Causa: Diferencia entre servidor y cliente
-- Solución: Usar `useEffect` para estado que depende del cliente
+- Cause: mismatch between server and client (typically from reading `localStorage`/Zustand before hydration).
+- Fix: wait for `useAuthHydrated()` (or another mount guard) before rendering client-dependent content.
 
-```tsx
-const [mounted, setMounted] = useState(false);
-useEffect(() => setMounted(true), []);
-if (!mounted) return null;
-```
-
-**Error: "Cannot read properties of null"**
-- Causa: Datos no cargados
-- Solución: Verificar estado de loading
+**Error: "Cannot read properties of null/undefined"**
+- Cause: data not loaded yet.
+- Fix: check TanStack Query's `isLoading`/`isError` before accessing `data`.
 
 ```tsx
 if (isLoading) return <Loading />;
-if (!data) return <EmptyState />;
+if (isError) return <EmptyData />;
 ```
 
-**Error: "Token expired"**
-- Causa: Sesión expirada
-- Solución: El interceptor maneja esto automáticamente
+**"Ghost" session (redirects to login despite having a token, or vice versa)**
+- Cause: the 4 session-state locations (see [Authentication](#-authentication)) went out of sync — e.g. `localStorage` was cleared but not the cookie, or vice versa.
+- Fix: verify that login/logout always touch all four (`AUTH_TOKEN`, `USER` in localStorage; the `auth_token` cookie; `useAuthStore`).
 
-## 📚 Recursos Adicionales
+**`pnpm install` fails or warns about blocked builds for native dependencies**
+- Cause: pnpm blocks `postinstall` scripts of native packages (`sharp`, `unrs-resolver`) for security.
+- Fix: make sure `pnpm-workspace.yaml` (`allowBuilds`) is present and tracked; see [`INCONSISTENCIES.md`](./INCONSISTENCIES.md#3-pnpm-workspaceyaml-sin-trackear-de-propósito-poco-claro).
+
+## 📚 Additional Resources
 
 - [Next.js Documentation](https://nextjs.org/docs)
 - [TanStack Query Docs](https://tanstack.com/query/latest)
@@ -624,14 +485,15 @@ if (!data) return <EmptyState />;
 - [Tailwind CSS](https://tailwindcss.com/docs)
 - [React Hook Form](https://react-hook-form.com/)
 
-## 👥 Contribución
+## 👥 Contributing
 
-1. Crear branch desde `develop`
-2. Hacer cambios siguiendo las [reglas de código](./CODING_RULES.md)
-3. Crear Pull Request
-4. Code review
-5. Merge a `develop`
+1. Create a branch from `develop`.
+2. Make changes following the [coding rules](./CODING_RULES.md) and the [How to Work in This Project](#-how-to-work-in-this-project) section.
+3. `pnpm lint` and `pnpm build` passing.
+4. Open a Pull Request against `develop`.
+5. Code review using the checklist in `CODING_RULES.md`.
+6. Merge to `develop`.
 
-## 📄 Licencia
+## 📄 License
 
-Este proyecto es privado y confidencial.
+This project is private and confidential.

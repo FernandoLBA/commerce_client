@@ -1,145 +1,149 @@
-# Coding Rules & Conventions - E-Commerce Frontend
+# Coding Rules & Conventions — E-Commerce Frontend
 
-Este documento establece las reglas y convenciones de código para el proyecto frontend de e-commerce. Todas las contribuciones deben seguir estas directrices para mantener la consistencia y calidad del código.
+This document establishes the coding rules and conventions for the e-commerce frontend project. All contributions should follow these guidelines to keep the codebase consistent and maintainable.
 
-## 📋 Tabla de Contenidos
+## 📋 Table of Contents
 
-1. [Principios Generales](#principios-generales)
-2. [Estructura del Proyecto](#estructura-del-proyecto)
+1. [General Principles](#general-principles)
+2. [Project Structure](#project-structure)
 3. [TypeScript](#typescript)
 4. [React & Next.js](#react--nextjs)
-5. [Estilos con Tailwind CSS](#estilos-con-tailwind-css)
-6. [Estado Global (Zustand)](#estado-global-zustand)
+5. [Styling with Tailwind CSS](#styling-with-tailwind-css)
+6. [Global State (Zustand)](#global-state-zustand)
 7. [Data Fetching (TanStack Query)](#data-fetching-tanstack-query)
-8. [Formularios](#formularios)
-9. [Componentes](#componentes)
-10. [Constantes y Enums](#constantes-y-enums)
-11. [Manejo de Errores](#manejo-de-errores)
+8. [Forms](#forms)
+9. [Components](#components)
+10. [Constants and Enums](#constants-and-enums)
+11. [Error Handling](#error-handling)
 12. [Testing](#testing)
 13. [Git & Commits](#git--commits)
 
 ---
 
-## Principios Generales
+## General Principles
 
-### ✅ Hacer
+### ✅ Do
 
-- **DRY (Don't Repeat Yourself)**: Abstraer código repetido en funciones o componentes reutilizables
-- **KISS (Keep It Simple, Stupid)**: Preferir soluciones simples sobre complejas
-- **Composición sobre herencia**: Usar composición de componentes
-- **Separación de responsabilidades**: Un componente = una responsabilidad
-- **Inmutabilidad**: No mutar estado directamente
+- **DRY (Don't Repeat Yourself)**: abstract repeated code into reusable functions or components
+- **KISS (Keep It Simple, Stupid)**: prefer simple solutions over complex ones
+- **Composition over inheritance**: use component composition
+- **Separation of concerns**: one component = one responsibility
+- **Immutability**: don't mutate state directly
 
-### ❌ No Hacer
+### ❌ Don't
 
-- Usar `any` en TypeScript
-- Usar strings/números mágicos (definir constantes)
-- Ignorar errores de TypeScript/ESLint
-- Crear componentes con más de 300 líneas
-- Anidar más de 3 niveles de componentes
+- Use `any` in TypeScript
+- Use magic strings/numbers (define constants instead)
+- Ignore TypeScript/ESLint errors
+- Create components over 300 lines
+- Nest components more than 3 levels deep
 
 ---
 
-## Estructura del Proyecto
+## Project Structure
+
+> The layout below reflects the intended convention. For the actual current folder-by-folder structure, see [`PROJECT_MANUAL.md`](./PROJECT_MANUAL.md); some items here (`app/(public)/`, `components/features/`, `components/shared/`) are aspirational and not yet present in the codebase — see [`../INCONSISTENCIES.md`](./INCONSISTENCIES.md) for details.
 
 ```
 src/
-├── app/                    # Rutas de Next.js App Router
-│   ├── (public)/          # Rutas públicas (sin layout de auth)
-│   ├── account/           # Páginas de cuenta de usuario
-│   ├── auth/              # Páginas de autenticación
-│   └── layout.tsx         # Layout principal
+├── app/                    # Next.js App Router routes
+│   ├── (public)/          # Public routes (no auth layout)
+│   ├── account/           # User account pages
+│   ├── auth/              # Authentication pages
+│   └── layout.tsx         # Root layout
 │
-├── components/            # Componentes React
-│   ├── ui/               # Componentes UI base (Button, Input, Modal)
-│   ├── layout/           # Componentes de layout (Header, Footer)
-│   ├── features/         # Componentes específicos de features
-│   └── shared/           # Componentes compartidos
+├── components/            # React components
+│   ├── ui/               # Base UI components (Button, Input, Modal)
+│   ├── layout/           # Layout components (Header, Footer)
+│   ├── features/         # Feature-specific components
+│   └── shared/            # Shared components
 │
-├── constants/            # Constantes y enums
-│   ├── enums.ts         # Todos los enums de la aplicación
-│   ├── api.ts           # Endpoints y configuración de API
-│   ├── app.ts           # Configuración de la aplicación
-│   └── ui.ts            # Constantes de UI (rutas, breakpoints)
+├── constants/            # Constants and enums
+│   ├── enums.ts         # All application enums
+│   ├── api.ts           # API endpoints and configuration
+│   ├── app.ts           # Application configuration
+│   └── ui.ts            # UI constants (routes, breakpoints)
 │
 ├── hooks/               # Custom hooks
-│   ├── api/            # Hooks de TanStack Query
-│   └── use*.ts         # Otros hooks personalizados
+│   ├── api/            # TanStack Query hooks
+│   └── use*.ts         # Other custom hooks
 │
-├── lib/                 # Utilidades y configuración
-│   ├── api/            # Cliente axios y servicios
-│   ├── utils.ts        # Funciones utilitarias
-│   └── validations.ts  # Schemas de Yup
+├── lib/                 # Utilities and configuration
+│   ├── api/            # Axios client and services
+│   ├── utils.ts        # Utility functions
+│   └── validations.ts  # Yup schemas
 │
 ├── providers/          # Context providers
 │
 ├── store/             # Zustand stores
 │
-└── types/             # Definiciones de TypeScript
+└── types/             # TypeScript definitions
 ```
 
-### Convenciones de Nombres de Archivos
+### File Naming Conventions
 
-| Tipo | Convención | Ejemplo |
+| Type | Convention | Example |
 |------|------------|---------|
-| Componentes | PascalCase | `ProductCard.tsx` |
-| Hooks | camelCase con prefijo `use` | `useProducts.ts` |
-| Utilidades | camelCase | `formatCurrency.ts` |
-| Constantes | camelCase | `apiEndpoints.ts` |
-| Tipos | PascalCase | `Product.ts` |
-| Páginas Next.js | lowercase | `page.tsx` |
+| Components | PascalCase | `ProductCard.tsx` |
+| Hooks | camelCase with `use` prefix | `useProducts.ts` |
+| Utilities | camelCase | `formatCurrency.ts` |
+| Constants | camelCase | `apiEndpoints.ts` |
+| Types | PascalCase | `Product.ts` |
+| Next.js pages | lowercase | `page.tsx` |
+
+> Note: the actual codebase currently uses **kebab-case** filenames for components, hooks, stores, and types (e.g. `product-card.tsx`, `use-products.ts`, `product.type.ts`), not the PascalCase/camelCase shown above. Treat the table above as the target convention going forward and align new files to it; see [`../INCONSISTENCIES.md`](./INCONSISTENCIES.md) for the full list of naming discrepancies found in the existing code.
 
 ---
 
 ## TypeScript
 
-### Tipado Estricto
+### Strict Typing
 
 ```typescript
-// ✅ Correcto
+// ✅ Correct
 interface ProductCardProps {
   product: Product;
   onAddToCart: (productId: string) => void;
   showRating?: boolean;
 }
 
-// ❌ Incorrecto - usar any
+// ❌ Incorrect - using any
 interface ProductCardProps {
   product: any;
   onAddToCart: Function;
 }
 ```
 
-### Usar Type vs Interface
+### Type vs Interface
 
-- **Interface**: Para objetos y contratos de API
-- **Type**: Para unions, intersections y tipos utilitarios
+- **Interface**: for objects and API contracts
+- **Type**: for unions, intersections, and utility types
 
 ```typescript
-// Interface para objetos
+// Interface for objects
 interface User {
   id: string;
   email: string;
   firstName: string;
 }
 
-// Type para unions
+// Type for unions
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
-// Type para utilidades
+// Type for utilities
 type PartialUser = Partial<User>;
 ```
 
 ### Enums vs Union Types
 
-Preferir union types para conjuntos pequeños, enums para conjuntos grandes con valores asociados:
+Prefer union types for small sets of values, enums for larger sets with associated meaning:
 
 ```typescript
-// Union type para valores simples
+// Union type for simple values
 type Size = 'sm' | 'md' | 'lg';
 
-// Enum para valores con significado en backend
+// Enum for values with meaning on the backend
 enum OrderStatus {
   PENDING = 'PENDING',
   PROCESSING = 'PROCESSING',
@@ -149,13 +153,13 @@ enum OrderStatus {
 }
 ```
 
-### Evitar Type Assertions
+### Avoid Type Assertions
 
 ```typescript
-// ❌ Evitar
+// ❌ Avoid
 const user = data as User;
 
-// ✅ Preferir validación
+// ✅ Prefer validation
 if (isUser(data)) {
   const user = data;
 }
@@ -165,12 +169,12 @@ if (isUser(data)) {
 
 ## React & Next.js
 
-### Componentes Funcionales
+### Functional Components
 
-Siempre usar componentes funcionales con TypeScript:
+Always use functional components with TypeScript:
 
 ```typescript
-// ✅ Correcto
+// ✅ Correct
 interface ProductCardProps {
   product: Product;
 }
@@ -179,27 +183,27 @@ export function ProductCard({ product }: ProductCardProps) {
   return <div>{product.name}</div>;
 }
 
-// ❌ Incorrecto - Class components
+// ❌ Incorrect - class components
 class ProductCard extends React.Component {}
 ```
 
 ### Hooks
 
-Seguir las reglas de hooks de React:
+Follow React's rules of hooks:
 
 ```typescript
-// ✅ Correcto - hooks al inicio del componente
+// ✅ Correct - hooks at the top of the component
 function ProductList() {
   const [page, setPage] = useState(1);
   const { data, isLoading } = useProducts({ page });
   
-  // Derivar estado cuando sea posible
+  // Derive state when possible
   const hasProducts = data?.length > 0;
   
   // ...
 }
 
-// ❌ Incorrecto - hooks condicionales
+// ❌ Incorrect - conditional hooks
 function ProductList({ show }: { show: boolean }) {
   if (show) {
     const [page, setPage] = useState(1); // Error!
@@ -210,15 +214,15 @@ function ProductList({ show }: { show: boolean }) {
 ### Server vs Client Components
 
 ```typescript
-// Server Component (por defecto en App Router)
-// Para: fetch de datos, acceso a backend, sin interactividad
+// Server Component (default in App Router)
+// For: data fetching, backend access, no interactivity
 export default async function ProductsPage() {
   const products = await fetchProducts();
   return <ProductList products={products} />;
 }
 
-// Client Component (con 'use client')
-// Para: interactividad, hooks de estado, eventos
+// Client Component (with 'use client')
+// For: interactivity, state hooks, event handlers
 'use client';
 
 export function AddToCartButton({ productId }: { productId: string }) {
@@ -227,33 +231,33 @@ export function AddToCartButton({ productId }: { productId: string }) {
 }
 ```
 
-### Memoización
+### Memoization
 
-Usar `useMemo` y `useCallback` con propósito:
+Use `useMemo` and `useCallback` with purpose:
 
 ```typescript
-// ✅ Correcto - cálculo costoso
+// ✅ Correct - expensive computation
 const sortedProducts = useMemo(() => 
   products.sort((a, b) => a.price - b.price),
   [products]
 );
 
-// ✅ Correcto - callback pasado a componente memoizado
+// ✅ Correct - callback passed to a memoized component
 const handleClick = useCallback(() => {
   onAddToCart(productId);
 }, [onAddToCart, productId]);
 
-// ❌ Incorrecto - memoización innecesaria
+// ❌ Incorrect - unnecessary memoization
 const name = useMemo(() => product.name, [product.name]);
 ```
 
 ---
 
-## Estilos con Tailwind CSS
+## Styling with Tailwind CSS
 
-### Organización de Clases
+### Class Organization
 
-Seguir este orden lógico:
+Follow this logical order:
 
 1. Layout (display, position)
 2. Box model (width, height, padding, margin)
@@ -263,16 +267,16 @@ Seguir este orden lógico:
 6. Responsive (sm:, md:, lg:)
 
 ```typescript
-// ✅ Correcto - orden lógico
+// ✅ Correct - logical order
 <div className="flex items-center justify-between w-full p-4 text-sm font-medium bg-white border rounded-lg shadow-sm hover:shadow-md sm:p-6">
 ```
 
-### Usar cn() para Clases Condicionales
+### Use cn() for Conditional Classes
 
 ```typescript
 import { cn } from '@/lib/utils';
 
-// ✅ Correcto
+// ✅ Correct
 <button
   className={cn(
     'px-4 py-2 rounded-lg font-medium',
@@ -283,10 +287,10 @@ import { cn } from '@/lib/utils';
 >
 ```
 
-### Variables CSS para Colores de Marca
+### CSS Variables for Brand Colors
 
 ```css
-/* En globals.css */
+/* In globals.css */
 :root {
   --color-primary-50: #eff6ff;
   --color-primary-600: #2563eb;
@@ -294,26 +298,28 @@ import { cn } from '@/lib/utils';
 }
 ```
 
+> The project uses Tailwind CSS 4, configured CSS-first (`@import "tailwindcss"` + `@theme inline` in `globals.css`) — there is no `tailwind.config.ts`. Brand colors currently live under the `--color-primary-*` scale, not `--color-primary-600` alone as a single accent.
+
 ### Responsive Design
 
 Mobile-first approach:
 
 ```typescript
-// ✅ Correcto - mobile first
+// ✅ Correct - mobile first
 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
-// ❌ Incorrecto - desktop first
+// ❌ Incorrect - desktop first
 <div className="grid grid-cols-4 md:grid-cols-2 sm:grid-cols-1">
 ```
 
 ---
 
-## Estado Global (Zustand)
+## Global State (Zustand)
 
-### Estructura del Store
+### Store Structure
 
 ```typescript
-// store/authStore.ts
+// store/auth.ts
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -347,30 +353,30 @@ export const useAuthStore = create<AuthState>()(
 );
 ```
 
-### Selectores para Rendimiento
+### Selectors for Performance
 
 ```typescript
-// ✅ Correcto - selector específico
+// ✅ Correct - specific selector
 const user = useAuthStore((state) => state.user);
 
-// ❌ Evitar - suscribirse a todo el store
+// ❌ Avoid - subscribing to the whole store
 const { user, token, isAuthenticated } = useAuthStore();
 ```
 
-### Separar Concerns
+### Separate Concerns
 
-- `authStore.ts`: Autenticación
-- `cartStore.ts`: Carrito local
-- `uiStore.ts`: Estado de UI (modals, toasts, sidebar)
+- `auth.ts`: authentication
+- `cart.ts`: local cart
+- `ui.ts`: UI state (modals, toasts, sidebar)
 
 ---
 
 ## Data Fetching (TanStack Query)
 
-### Estructura de Hooks
+### Hook Structure
 
 ```typescript
-// hooks/api/useProducts.ts
+// hooks/api/use-products.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { productsApi } from '@/lib/api/products';
 
@@ -404,7 +410,7 @@ export function useCreateProduct() {
 }
 ```
 
-### Manejo de Estados
+### Handling States
 
 ```typescript
 function ProductList() {
@@ -444,7 +450,7 @@ export function useUpdateProduct() {
 
 ---
 
-## Formularios
+## Forms
 
 ### React Hook Form + Yup
 
@@ -455,19 +461,19 @@ import * as yup from 'yup';
 export const loginSchema = yup.object({
   email: yup
     .string()
-    .required('El email es requerido')
-    .email('Email inválido'),
+    .required('Email is required')
+    .email('Invalid email'),
   password: yup
     .string()
-    .required('La contraseña es requerida')
-    .min(6, 'Mínimo 6 caracteres'),
+    .required('Password is required')
+    .min(6, 'Minimum 6 characters'),
 });
 
 export type LoginFormData = yup.InferType<typeof loginSchema>;
 ```
 
 ```typescript
-// Uso en componente
+// Usage in a component
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { loginSchema, LoginFormData } from '@/lib/validations';
@@ -493,13 +499,13 @@ function LoginForm() {
         error={errors.email?.message}
       />
       <Input
-        label="Contraseña"
+        label="Password"
         type="password"
         {...register('password')}
         error={errors.password?.message}
       />
       <Button type="submit" isLoading={isSubmitting}>
-        Iniciar sesión
+        Sign in
       </Button>
     </form>
   );
@@ -508,12 +514,12 @@ function LoginForm() {
 
 ---
 
-## Componentes
+## Components
 
-### Estructura de un Componente
+### Component Structure
 
 ```typescript
-// components/ui/Button.tsx
+// components/ui/button.tsx
 'use client';
 
 import { forwardRef, type ButtonHTMLAttributes } from 'react';
@@ -569,10 +575,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = 'Button';
 ```
 
-### Props: Desestructuración y Defaults
+### Props: Destructuring and Defaults
 
 ```typescript
-// ✅ Correcto
+// ✅ Correct
 function ProductCard({
   product,
   showRating = true,
@@ -581,7 +587,7 @@ function ProductCard({
   // ...
 }
 
-// ❌ Evitar - props object
+// ❌ Avoid - props object
 function ProductCard(props: ProductCardProps) {
   const showRating = props.showRating ?? true;
   // ...
@@ -590,11 +596,11 @@ function ProductCard(props: ProductCardProps) {
 
 ---
 
-## Constantes y Enums
+## Constants and Enums
 
-### Ubicación
+### Location
 
-Todas las constantes en `/src/constants/`:
+All constants in `/src/constants/`:
 
 ```typescript
 // constants/enums.ts
@@ -635,24 +641,24 @@ export const BREAKPOINTS = {
 } as const;
 ```
 
-### Uso
+### Usage
 
 ```typescript
-// ✅ Correcto
+// ✅ Correct
 import { OrderStatus } from '@/constants/enums';
 import { ROUTES } from '@/constants/ui';
 
 if (order.status === OrderStatus.PENDING) { /* ... */ }
 router.push(ROUTES.PRODUCTS);
 
-// ❌ Incorrecto - strings mágicos
+// ❌ Incorrect - magic strings
 if (order.status === 'PENDING') { /* ... */ }
 router.push('/products');
 ```
 
 ---
 
-## Manejo de Errores
+## Error Handling
 
 ### API Errors
 
@@ -676,7 +682,7 @@ apiClient.interceptors.response.use(
   (error) => {
     if (axios.isAxiosError(error)) {
       throw new ApiError(
-        error.response?.data?.message || 'Error de conexión',
+        error.response?.data?.message || 'Connection error',
         error.response?.status || 500,
         error.response?.data
       );
@@ -719,30 +725,30 @@ export class ErrorBoundary extends Component<Props, State> {
 }
 ```
 
-### Mostrar Errores al Usuario
+### Showing Errors to the User
 
 ```typescript
-// Opción 1: Usando helpers de toast (recomendado)
+// Option 1: using toast helpers (recommended)
 import { toast } from '@/store';
 
 try {
   await mutation.mutateAsync(data);
-  toast.success('Operación exitosa', 'Los cambios fueron guardados');
+  toast.success('Success', 'Your changes were saved');
 } catch (error) {
   toast.error(
     'Error',
-    error instanceof ApiError ? error.message : 'Error inesperado'
+    error instanceof ApiError ? error.message : 'Unexpected error'
   );
 }
 
-// Opción 2: Usando el UI Store directamente
+// Option 2: using the UI Store directly
 const { addToast } = useUIStore();
 
 addToast({ 
   type: 'success', 
-  title: 'Producto agregado',
-  message: 'Se añadió al carrito correctamente',
-  duration: 5000 // opcional, default 5000ms
+  title: 'Product added',
+  message: 'Successfully added to cart',
+  duration: 5000 // optional, default 5000ms
 });
 ```
 
@@ -750,7 +756,9 @@ addToast({
 
 ## Testing
 
-### Estructura
+> There is currently no testing infrastructure set up in this repository (no test runner installed, no `test` script, no `__tests__/` folder). The structure and conventions below are the target to adopt once a testing stack (suggested: Vitest + React Testing Library + Playwright) is introduced. See [`PROJECT_MANUAL.md`](./PROJECT_MANUAL.md#-testing) and [`../INCONSISTENCIES.md`](./INCONSISTENCIES.md).
+
+### Structure
 
 ```
 __tests__/
@@ -762,7 +770,7 @@ __tests__/
     └── formatCurrency.test.ts
 ```
 
-### Convenciones
+### Conventions
 
 ```typescript
 // __tests__/components/Button.test.tsx
@@ -793,9 +801,9 @@ describe('Button', () => {
 
 ## Git & Commits
 
-### Formato de Commits
+### Commit Format
 
-Usar Conventional Commits:
+Use Conventional Commits:
 
 ```
 <type>(<scope>): <description>
@@ -806,15 +814,15 @@ Usar Conventional Commits:
 ```
 
 **Types:**
-- `feat`: Nueva funcionalidad
-- `fix`: Corrección de bug
-- `docs`: Documentación
-- `style`: Formateo, sin cambios de código
-- `refactor`: Refactorización
-- `test`: Tests
-- `chore`: Tareas de mantenimiento
+- `feat`: new feature
+- `fix`: bug fix
+- `docs`: documentation
+- `style`: formatting, no code changes
+- `refactor`: refactoring
+- `test`: tests
+- `chore`: maintenance tasks
 
-**Ejemplos:**
+**Examples:**
 ```
 feat(cart): add remove item functionality
 fix(auth): handle token expiration correctly
@@ -825,32 +833,32 @@ refactor(products): extract ProductCard component
 ### Branches
 
 ```
-main              # Producción
-develop           # Desarrollo
-feature/cart-page # Nueva funcionalidad
-fix/login-error   # Corrección
+main              # Production
+develop           # Development
+feature/cart-page # New feature
+fix/login-error   # Bug fix
 ```
 
 ---
 
-## Checklist de Code Review
+## Code Review Checklist
 
-- [ ] Sin `any` en TypeScript
-- [ ] Sin strings/números mágicos
-- [ ] Componentes < 300 líneas
-- [ ] Tests para nueva funcionalidad
-- [ ] Errores manejados correctamente
+- [ ] No `any` in TypeScript
+- [ ] No magic strings/numbers
+- [ ] Components < 300 lines
+- [ ] Tests for new functionality
+- [ ] Errors handled correctly
 - [ ] Mobile-first responsive
-- [ ] Accesibilidad básica (aria, focus)
-- [ ] Código documentado cuando es complejo
-- [ ] Imports ordenados
-- [ ] Sin console.log en producción
+- [ ] Basic accessibility (aria, focus)
+- [ ] Code documented when complex
+- [ ] Imports ordered
+- [ ] No `console.log` in production
 
 ---
 
-## Reglas Visuales para Flujos de Autenticación
+## Visual Rules for Authentication Flows
 
-- Todas las páginas de flujos de autenticación (recuperación de contraseña, activación de cuenta, etc.) deben mostrar un ícono visual relevante arriba del título principal.
-- El ícono debe estar dentro de un círculo de color (ejemplo: azul, verde, amarillo) y debe ser representativo del estado o acción (por ejemplo: mail, check, spinner).
-- Esta regla aplica tanto para estados de éxito, formulario inicial y loading.
-- El objetivo es mejorar la comprensión del usuario y mantener consistencia visual en todos los flujos.
+- All authentication flow pages (password recovery, account activation, etc.) must display a relevant visual icon above the main title.
+- The icon must sit inside a colored circle (e.g. blue, green, yellow) and be representative of the state or action (e.g. mail, check, spinner).
+- This rule applies to success states, the initial form, and loading states alike.
+- The goal is to improve user comprehension and keep visual consistency across all flows.

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+
 import { ROUTES } from './constants';
 
 /**
@@ -57,12 +58,12 @@ export function middleware(request: NextRequest) {
 
   // If user is authenticated and trying to access auth routes, redirect to home
   if (token && isAuthRoute(pathname)) {
-    return NextResponse.redirect(new URL('/', request.url));
+    return NextResponse.redirect(new URL(ROUTES.HOME, request.url));
   }
 
   // If user is not authenticated and trying to access protected routes, redirect to login
   if (!token && isProtectedRoute(pathname)) {
-    const loginUrl = new URL('/auth/login', request.url);
+    const loginUrl = new URL(ROUTES.AUTH.LOGIN, request.url);
     // Add the original URL as a redirect parameter
     loginUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(loginUrl);

@@ -46,7 +46,7 @@ export function BackofficeSidebar({ isOpen = true, onClose }: BackofficeSidebarP
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-30 flex w-64 flex-col bg-gray-900 transition-transform duration-300 lg:static lg:translate-x-0',
+          'h-screen left-0 z-30 flex w-64 flex-col bg-gray-900 transition-transform duration-300 lg:static lg:translate-x-0',
           isOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
@@ -63,7 +63,8 @@ export function BackofficeSidebar({ isOpen = true, onClose }: BackofficeSidebarP
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-4">
+        {/* <nav className="flex-1 overflow-y-auto py-4"> */}
+        <nav className="flex-1 py-4">
           <ul className="space-y-1 px-3">
             {BACKOFFICE_NAV.map((item) => {
               const isActive = item.exact
